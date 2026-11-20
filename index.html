@@ -1,0 +1,1261 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2651d4">
+  <meta name="description" content="Outil non officiel de préparation des interventions du Conseil communal d’Ecublens.">
+  <title>Préparer une intervention — outil non officiel d’Ecublens</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #252a33;
+      --muted: #626b78;
+      --blue: #2651d4;
+      --blue-dark: #173a91;
+      --gold: #dcd134;
+      --line: #d9dce2;
+      --paper: #fff;
+      --canvas: #f4f5f7;
+      --red: #c60808;
+      --success: #246b45;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-synthesis: none;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background: var(--canvas);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    button, input, textarea, [contenteditable="true"] { font: inherit; }
+    button { cursor: pointer; }
+
+    .masthead {
+      color: #fff;
+      background: var(--blue);
+      border-bottom: 4px solid var(--gold);
+    }
+
+    .masthead-inner, main, .footer-inner {
+      width: min(100% - 40px, 920px);
+      margin-inline: auto;
+    }
+
+    .masthead-inner {
+      display: flex;
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 5px;
+      min-height: 118px;
+      padding-block: 16px;
+    }
+
+    .brand { min-width: 0; }
+    .brand-kicker {
+      margin: 0;
+      color: var(--gold);
+      font-size: clamp(14px, 2.4vw, 19px);
+      font-weight: 750;
+      letter-spacing: .035em;
+      line-height: 1.3;
+    }
+    .brand-meta { display: flex; flex-wrap: wrap; gap: 7px 22px; color: #eaf0f5; font-size: 13px; }
+    .brand-meta p { margin: 0; }
+    .brand-meta a { color: #fff; text-underline-offset: 3px; }
+
+    main { padding-block: 38px 56px; }
+
+    .intro { margin-bottom: 24px; }
+    .eyebrow {
+      margin: 0 0 7px;
+      color: var(--red);
+      font-size: 11px;
+      font-weight: 780;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      color: var(--blue-dark);
+      font-size: clamp(29px, 5vw, 39px);
+      line-height: 1.15;
+      letter-spacing: -.04em;
+    }
+    .intro-note { margin: 9px 0 0; color: var(--muted); font-size: 14px; }
+    .notice {
+      display: grid;
+      grid-template-columns: 26px 1fr;
+      gap: 12px;
+      margin-bottom: 22px;
+      padding: 16px 18px;
+      border: 1px solid var(--gold);
+      border-radius: 2px;
+      background: #fffef1;
+      color: #34343a;
+    }
+    .notice-icon {
+      display: grid;
+      width: 24px;
+      height: 24px;
+      place-items: center;
+      border-radius: 0;
+      background: var(--gold);
+      font-weight: 800;
+    }
+    .notice strong { display: block; margin: 0 0 2px; color: #272a32; }
+    .notice p { margin: 0; font-size: 13px; }
+
+    .card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      background: var(--paper);
+      box-shadow: none;
+    }
+    form { padding: clamp(20px, 5vw, 36px); }
+    .section-heading {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin: 0 0 20px;
+      color: var(--blue-dark);
+      font-size: 17px;
+      font-weight: 750;
+    }
+    .field-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 20px;
+    }
+    .field { min-width: 0; }
+    .field label, .field-label {
+      display: block;
+      margin-bottom: 7px;
+      color: #334b61;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .required { color: #a33e3e; }
+    input[type="date"], input[type="text"], .rich-editor {
+      width: 100%;
+      border: 1px solid #b9bfca;
+      border-radius: 2px;
+      outline: none;
+      background: #fff;
+      color: var(--ink);
+      transition: border-color .15s, box-shadow .15s;
+    }
+    input[type="date"], input[type="text"] { min-height: 46px; padding: 10px 12px; }
+    input:focus, .rich-editor:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 2px rgba(38, 81, 212, .14);
+    }
+    input[aria-invalid="true"], .rich-editor[aria-invalid="true"] { border-color: var(--red); }
+    .hint { margin: 6px 0 0; color: var(--muted); font-size: 12px; }
+
+    .types {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+    .types legend { grid-column: 1 / -1; margin: 0 0 -3px; padding: 0; }
+    .type-option {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 48px;
+      padding: 10px 12px;
+      border: 1px solid #cbd0d9;
+      border-radius: 0;
+      background: #fff;
+      color: #323943;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 650;
+      transition: border-color .12s, background .12s;
+    }
+    .type-option:has(input:checked) {
+      border-color: var(--blue);
+      background: #f1f3fc;
+      color: var(--blue-dark);
+    }
+    .type-option input {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 16px;
+      margin: 0;
+      accent-color: var(--blue);
+    }
+    .other-field { margin-top: 13px; }
+    .divider { height: 1px; margin: 27px 0; background: #e8edf1; }
+
+    .text-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .font-select { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .font-select select {
+      min-height: 36px;
+      padding: 5px 28px 5px 9px;
+      border: 1px solid #b9bfca;
+      border-radius: 0;
+      background: #fff;
+      color: var(--blue-dark);
+      font-weight: 700;
+    }
+    .text-length { display: flex; justify-content: space-between; gap: 12px; }
+    .editor-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 7px; }
+    .format-tool {
+      display: grid;
+      width: 36px;
+      height: 34px;
+      place-items: center;
+      border: 1px solid #b9bfca;
+      border-radius: 0;
+      background: #fff;
+      color: #323943;
+      font-size: 15px;
+    }
+    .format-tool[aria-pressed="true"], .format-tool:hover { background: #f1f3fc; border-color: var(--blue); }
+    .format-tool:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+    .rich-editor {
+      min-height: 255px;
+      padding: 14px;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+      resize: vertical;
+      overflow-y: auto;
+      line-height: 1.5;
+    }
+    .rich-editor:empty::before { content: attr(data-placeholder); color: #8a9aaa; pointer-events: none; }
+    .rich-editor > div, .rich-editor > p { margin: 0; }
+
+    .upload {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 18px;
+      min-height: 112px;
+      padding: 18px;
+      border: 1px solid #cbd0d9;
+      border-radius: 0;
+      background: #fff;
+    }
+    .upload-title { margin: 0; color: #323943; font-size: 14px; font-weight: 700; }
+    .upload-hint { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .upload-actions { display: flex; align-items: center; gap: 12px; }
+    .signature-preview {
+      display: none;
+      max-width: 125px;
+      max-height: 52px;
+      object-fit: contain;
+      border-radius: 0;
+      background: white;
+    }
+    .file-button, .remove-signature {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 39px;
+      padding: 8px 13px;
+      border: 1px solid #aeb6c4;
+      border-radius: 0;
+      background: white;
+      color: var(--blue-dark);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .remove-signature { display: none; color: var(--red); }
+    .file-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      clip-path: inset(50%);
+    }
+    .file-input:focus-visible + .file-button { outline: 2px solid var(--blue); outline-offset: 2px; }
+    .upload-error { margin: 8px 0 0; color: var(--red); font-size: 12px; }
+    .signature-field { margin-top: 12px; }
+
+    .choice-group {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+    .choice-group legend { grid-column: 1 / -1; margin: 0 0 2px; padding: 0; }
+    .choice-option {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 43px;
+      padding: 9px 12px;
+      border: 1px solid #cbd0d9;
+      border-radius: 0;
+      background: #fff;
+      color: #323943;
+      font-size: 13px;
+      font-weight: 650;
+      cursor: pointer;
+    }
+    .choice-option:has(input:checked) { border-color: var(--blue); background: #f1f3fc; }
+    .choice-option input { width: 16px; height: 16px; margin: 0; accent-color: var(--blue); }
+    .format-choices { display: block; margin-top: 20px; }
+    .download-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 11px; }
+    .download-card {
+      display: grid;
+      gap: 8px;
+      padding: 13px;
+      border: 1px solid #cbd0d9;
+      border-radius: 0;
+      background: #fff;
+    }
+    .download-card > strong { color: var(--blue-dark); font-size: 13px; }
+    .download-choice { display: flex; align-items: center; gap: 8px; color: #445a6f; font-size: 12px; cursor: pointer; }
+    .download-choice input { width: 15px; height: 15px; margin: 0; accent-color: var(--blue); }
+    .download-choice input:disabled { cursor: not-allowed; }
+    .download-choice:has(input:disabled) { color: #9aa8b6; cursor: not-allowed; }
+    .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    .download {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 50px;
+      margin-top: 20px;
+      padding: 12px 20px;
+      border: 0;
+      border-radius: 0;
+      background: var(--blue);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 720;
+      transition: background .15s, opacity .15s;
+    }
+    .download:hover:not(:disabled) { background: #a30707; }
+    .download:disabled { cursor: not-allowed; opacity: .48; }
+    .download svg { width: 18px; height: 18px; }
+    .email-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 50px;
+      margin-top: 20px;
+      padding: 12px 18px;
+      border: 1px solid var(--blue);
+      border-radius: 0;
+      background: #fff;
+      color: var(--blue-dark);
+      font-size: 14px;
+      font-weight: 720;
+      text-decoration: none;
+    }
+    .email-button:hover { background: #f1f3fc; }
+    .status { min-height: 23px; margin: 12px 0 0; color: var(--muted); font-size: 13px; }
+    .status[data-state="error"] { color: var(--red); }
+    .status[data-state="success"] { color: var(--success); }
+
+    .privacy {
+      display: flex;
+      gap: 9px;
+      margin: 17px 0 0;
+      color: #617488;
+      font-size: 12px;
+    }
+    .privacy svg { width: 16px; height: 16px; flex: 0 0 16px; margin-top: 2px; color: var(--success); }
+    footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+    .footer-inner { padding-block: 19px 24px; }
+
+    @media (max-width: 700px) {
+      .types { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .type-option:last-child { grid-column: 1 / -1; }
+      .upload { grid-template-columns: 1fr; }
+      .upload-actions { justify-content: space-between; }
+    }
+    @media (max-width: 520px) {
+      .masthead-inner, main, .footer-inner { width: min(100% - 28px, 920px); }
+      .masthead-inner { min-height: 118px; }
+      .brand-meta { flex-direction: column; gap: 1px; }
+      main { padding-block: 26px 38px; }
+      .field-grid { grid-template-columns: 1fr; gap: 16px; }
+      .download-grid { grid-template-columns: 1fr; }
+      .text-heading { align-items: flex-start; flex-direction: column; gap: 2px; }
+      .rich-editor { min-height: 220px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <div class="brand">
+        <p class="brand-kicker">OUTIL NON OFFICIEL · PRÉPARATION D’UNE INTERVENTION</p>
+        <div class="brand-meta">
+          <p>Daniel Sage (<a href="mailto:daniel@sage.li">daniel@sage.li</a>)</p>
+          <p>Date : 20 Novembre 2026</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow">Outil non officiel · Conseil communal d’Ecublens</p>
+      <h1 id="page-title">Préparer une intervention</h1>
+      <p class="intro-note">Le formulaire officiel, lui, ne se remplit toujours pas tout seul.</p>
+    </section>
+
+    <aside class="notice" role="note" aria-label="Avertissement">
+      <span class="notice-icon" aria-hidden="true">!</span>
+      <div>
+        <strong>Outil non officiel, réservé aux Conseillères et Conseillers communaux d’Ecublens</strong>
+        <p>Il sert uniquement à préparer une intervention sur le formulaire officiel. Le document téléchargé reprend le modèle officiel.</p>
+      </div>
+    </aside>
+
+    <section class="card" aria-label="Formulaire">
+      <form id="intervention-form">
+        <h2 class="section-heading">Votre intervention</h2>
+        <fieldset class="types" aria-describedby="type-hint">
+          <legend class="field-label">Type d’intervention <span class="required" aria-hidden="true">*</span></legend>
+          <label class="type-option"><input type="checkbox" name="type" value="Postulat">Postulat</label>
+          <label class="type-option"><input type="checkbox" name="type" value="Motion">Motion</label>
+          <label class="type-option"><input type="checkbox" name="type" value="Amendement">Amendement</label>
+          <label class="type-option"><input type="checkbox" name="type" value="Vœu">Vœu</label>
+          <label class="type-option"><input type="checkbox" name="type" value="Autre">Autre</label>
+        </fieldset>
+        <p class="hint" id="type-hint">Choisissez au moins un type. Vous pouvez en sélectionner plusieurs.</p>
+        <div class="field other-field" id="other-field" hidden>
+          <label for="other-type">Précisez le type « Autre » <span class="required" aria-hidden="true">*</span></label>
+          <input id="other-type" name="otherType" type="text" maxlength="100" placeholder="Ex. question, interpellation…" autocomplete="off">
+        </div>
+
+        <div class="divider"></div>
+        <div class="field-grid">
+          <div class="field">
+            <label for="date">Date <span class="hint">(facultatif)</span></label>
+            <input id="date" name="date" type="date">
+          </div>
+          <div class="field">
+            <label for="name">Nom et prénom <span class="hint">(facultatif)</span></label>
+            <input id="name" name="name" type="text" maxlength="120" autocomplete="name" placeholder="Votre nom complet">
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="field">
+          <div class="text-heading">
+            <label class="field-label" id="text-label" for="text">Texte de l’intervention <span class="required" aria-hidden="true">*</span></label>
+            <label class="font-select" for="font-size">Taille dans le document
+              <select id="font-size" name="fontSize">
+                <option value="10">10 pt</option>
+                <option value="11">11 pt</option>
+                <option value="12" selected>12 pt</option>
+                <option value="13">13 pt</option>
+              </select>
+            </label>
+          </div>
+          <div class="editor-toolbar" role="toolbar" aria-label="Mise en forme du texte">
+            <button class="format-tool" type="button" data-command="bold" aria-label="Gras" aria-pressed="false" title="Gras (⌘B / Ctrl+B)"><strong>B</strong></button>
+            <button class="format-tool" type="button" data-command="italic" aria-label="Italique" aria-pressed="false" title="Italique (⌘I / Ctrl+I)"><em>I</em></button>
+            <button class="format-tool" type="button" data-command="underline" aria-label="Souligné" aria-pressed="false" title="Souligné (⌘U / Ctrl+U)"><u>U</u></button>
+            <button class="format-tool" type="button" data-command="strikeThrough" aria-label="Barré" aria-pressed="false" title="Barré (⌘⇧X / Ctrl+Shift+X)"><s>S</s></button>
+          </div>
+          <div id="text" class="rich-editor" name="text" contenteditable="true" lang="fr" role="textbox" aria-labelledby="text-label" aria-multiline="true" aria-required="true" aria-describedby="character-count" data-placeholder="Rédigez le texte de votre intervention…" spellcheck="true"></div>
+          <div class="text-length">
+            <p class="hint" id="character-count" aria-live="polite">0 / 5 000</p>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="field signature-field" id="signature-field">
+          <span class="field-label">Upload signature <span class="hint">(facultatif)</span></span>
+          <div class="upload">
+            <div>
+              <p class="upload-title" id="signature-name">Aucune signature sélectionnée</p>
+              <p class="upload-hint">PNG ou JPEG · 5 Mo maximum. Les cases « Avec signature » seront activées après l’ajout.</p>
+            </div>
+            <div class="upload-actions">
+              <img class="signature-preview" id="signature-preview" alt="Aperçu de la signature">
+              <div>
+                <input class="file-input" id="signature" type="file" accept="image/png,image/jpeg" aria-describedby="signature-error">
+                <label class="file-button" for="signature">Téléverser une signature</label>
+              </div>
+              <button class="remove-signature" id="remove-signature" type="button">Retirer</button>
+            </div>
+          </div>
+          <p class="upload-error" id="signature-error" role="alert"></p>
+        </div>
+
+        <fieldset class="choice-group format-choices" aria-describedby="format-hint">
+          <legend class="field-label">Documents à télécharger</legend>
+          <div class="download-grid">
+            <div class="download-card">
+              <strong>Word (.docx)</strong>
+              <label class="download-choice"><input type="checkbox" name="export" value="docx:with" disabled>Avec signature</label>
+              <label class="download-choice"><input type="checkbox" name="export" value="docx:without">Sans signature</label>
+            </div>
+            <div class="download-card">
+              <strong>PDF</strong>
+              <label class="download-choice"><input type="checkbox" name="export" value="pdf:with" disabled>Avec signature</label>
+              <label class="download-choice"><input type="checkbox" name="export" value="pdf:without" checked>Sans signature</label>
+            </div>
+            <div class="download-card">
+              <strong>ODT (LibreOffice)</strong>
+              <label class="download-choice"><input type="checkbox" name="export" value="odt:with" disabled>Avec signature</label>
+              <label class="download-choice"><input type="checkbox" name="export" value="odt:without">Sans signature</label>
+            </div>
+          </div>
+        </fieldset>
+        <p class="hint" id="format-hint">Chaque case génère un fichier distinct. Si plusieurs sont cochées, autorisez les téléchargements multiples si votre navigateur le demande.</p>
+        <div class="actions">
+          <button class="download" id="download" type="button" disabled>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Télécharger
+          </button>
+          <a class="email-button" id="prepare-email" href="mailto:Silvana.DellaVecchia@ecublens.ch">Prepare Email</a>
+        </div>
+        <p class="hint">Le brouillon est adressé à Della Vecchia Silvana. Ajoutez-y le ou les fichiers téléchargés en pièces jointes.</p>
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+        <p class="privacy">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 5.5 6v5.1c0 4.3 2.7 8.2 6.5 9.9 3.8-1.7 6.5-5.6 6.5-9.9V6L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Vos informations et votre signature restent dans votre navigateur. Elles ne sont ni enregistrées sur ce site ni envoyées à un serveur. Le document est généré sur votre appareil.</span>
+        </p>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">Outil non officiel pour la préparation des interventions du Conseil communal d’Ecublens</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docx@9.5.1/dist/index.iife.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script>
+    (() => {
+      "use strict";
+
+      const form = document.getElementById("intervention-form");
+      const dateInput = document.getElementById("date");
+      const nameInput = document.getElementById("name");
+      const richEditor = document.getElementById("text");
+      const otherInput = document.getElementById("other-type");
+      const signatureInput = document.getElementById("signature");
+      const signaturePreview = document.getElementById("signature-preview");
+      const signatureName = document.getElementById("signature-name");
+      const signatureError = document.getElementById("signature-error");
+      const emailButton = document.getElementById("prepare-email");
+      const otherField = document.getElementById("other-field");
+      const status = document.getElementById("status");
+      const fontSizeSelect = document.getElementById("font-size");
+      const characterCount = document.getElementById("character-count");
+      const removeSignatureButton = document.getElementById("remove-signature");
+      const downloadButton = document.getElementById("download");
+      const typeInputs = [...document.querySelectorAll('input[name="type"]')];
+      const formatInputs = [...document.querySelectorAll('input[name="export"]')];
+      const formatTools = [...document.querySelectorAll(".format-tool")];
+      let signatureFile = null;
+      let signatureUrl = null;
+      let signatureDimensions = null;
+      let busy = false;
+      let templateLogoPromise = null;
+
+      function selectedTypes() {
+        return typeInputs.filter(input => input.checked).map(input => input.value);
+      }
+
+      function selectedFormats() {
+        return formatInputs.filter(input => input.checked).map(input => input.value);
+      }
+
+      function readRichText() {
+        const segments = [];
+        const initialStyle = { bold: false, italic: false, underline: false, strike: false };
+
+        function sameStyle(left, right) {
+          return left.bold === right.bold && left.italic === right.italic &&
+            left.underline === right.underline && left.strike === right.strike;
+        }
+
+        function append(text, style) {
+          if (!text) return;
+          const parts = text.split(/(\n)/);
+          for (const part of parts) {
+            if (!part) continue;
+            const previous = segments[segments.length - 1];
+            if (previous && sameStyle(previous, style)) previous.text += part;
+            else segments.push({ text: part, ...style });
+          }
+        }
+
+        function ensureLineBreak(style) {
+          if (segments.length && !segments[segments.length - 1].text.endsWith("\n")) append("\n", style);
+        }
+
+        function visit(node, style, root = false) {
+          if (node.nodeType === Node.TEXT_NODE) {
+            append(node.nodeValue, style);
+            return;
+          }
+          if (node.nodeType !== Node.ELEMENT_NODE) return;
+          const tag = node.tagName.toLowerCase();
+          if (tag === "br") {
+            append("\n", style);
+            return;
+          }
+          const block = !root && ["div", "p", "li"].includes(tag);
+          if (block) ensureLineBreak(style);
+          const next = {
+            bold: style.bold || ["b", "strong"].includes(tag),
+            italic: style.italic || ["i", "em"].includes(tag),
+            underline: style.underline || tag === "u",
+            strike: style.strike || ["s", "strike", "del"].includes(tag)
+          };
+          for (const child of node.childNodes) visit(child, next);
+          if (block) ensureLineBreak(style);
+        }
+
+        for (const child of richEditor.childNodes) visit(child, initialStyle, true);
+        const text = segments.map(segment => segment.text).join("");
+        const trimmed = text.trim();
+        if (!trimmed) return [];
+        if (trimmed.length !== text.length) {
+          let start = text.search(/\S/);
+          let end = text.length;
+          while (end > start && /\s/.test(text[end - 1])) end--;
+          let offset = 0;
+          const result = [];
+          for (const segment of segments) {
+            const from = Math.max(start, offset);
+            const to = Math.min(end, offset + segment.text.length);
+            if (to > from) result.push({ ...segment, text: segment.text.slice(from - offset, to - offset) });
+            offset += segment.text.length;
+          }
+          return result;
+        }
+        return segments;
+      }
+
+      function selectedFontSize() {
+        return Number(fontSizeSelect.value);
+      }
+
+      function updateFormState() {
+        const types = selectedTypes();
+        const needsOther = types.includes("Autre");
+        const runs = readRichText();
+        const text = runs.map(run => run.text).join("");
+        const formats = selectedFormats();
+        otherField.hidden = !needsOther;
+        otherInput.required = needsOther;
+        otherInput.setAttribute("aria-invalid", String(needsOther && !otherInput.value.trim()));
+        for (const input of formatInputs) {
+          const needsSignature = input.value.endsWith(":with");
+          input.disabled = needsSignature && !signatureFile;
+          if (input.disabled) input.checked = false;
+        }
+        signatureError.textContent = "";
+        characterCount.textContent = `${text.length.toLocaleString("fr-CH")} / 5 000`;
+        characterCount.setAttribute("aria-label", `${text.length} caractères sur 5 000`);
+        characterCount.style.color = text.length > 5000 ? "var(--red)" : "";
+        richEditor.setAttribute("aria-invalid", String(text.length > 5000));
+        const hasType = types.length > 0;
+        const valid = hasType && Boolean(text.trim()) && text.length <= 5000 &&
+          formats.length > 0 && (!needsOther || Boolean(otherInput.value.trim()));
+        downloadButton.disabled = !valid || busy;
+        updateEmailLink();
+        return valid;
+      }
+
+      function setStatus(message, state = "") {
+        status.textContent = message;
+        status.dataset.state = state;
+      }
+
+      function setSignature(file) {
+        if (signatureUrl) URL.revokeObjectURL(signatureUrl);
+        signatureFile = file;
+        signatureUrl = file ? URL.createObjectURL(file) : null;
+        if (!file) signatureDimensions = null;
+        signatureError.textContent = "";
+        signaturePreview.style.display = file ? "block" : "none";
+        signaturePreview.src = signatureUrl || "";
+        signatureName.textContent = file ? file.name : "Aucune signature sélectionnée";
+        removeSignatureButton.style.display = file ? "inline-flex" : "none";
+        signatureInput.value = "";
+        updateFormState();
+      }
+
+      function updateOtherTypeError() {
+        otherInput.setAttribute("aria-invalid", String(typeInputs.some(input => input.checked && input.value === "Autre") && !otherInput.value.trim()));
+      }
+
+      function readSignature() {
+        if (!signatureFile) return Promise.resolve(null);
+        return signatureFile.arrayBuffer().then(buffer => ({
+          bytes: new Uint8Array(buffer),
+          type: signatureFile.type === "image/png" ? "png" : "jpg",
+          width: signatureDimensions.width,
+          height: signatureDimensions.height
+        }));
+      }
+
+      function getFormData() {
+        const types = selectedTypes();
+        const richRuns = readRichText();
+        const text = richRuns.map(run => run.text).join("");
+        const otherLabel = otherInput.value.trim();
+        const mappedOtherTypes = [];
+        if (types.includes("Vœu")) mappedOtherTypes.push("Vœu");
+        if (types.includes("Autre")) mappedOtherTypes.push(otherLabel);
+        return {
+          types,
+          otherType: mappedOtherTypes.join(" / "),
+          date: dateInput.value,
+          dateDisplay: dateInput.value
+            ? new Intl.DateTimeFormat("fr-CH", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(`${dateInput.value}T12:00:00`))
+            : "",
+          name: nameInput.value.trim(),
+          richRuns,
+          text,
+          fontSize: selectedFontSize(),
+        };
+      }
+
+      function filename(data, extension, withSignature) {
+        const person = data.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase();
+        const signature = withSignature ? "avec-signature" : "sans-signature";
+        return `intervention-${person || "ecublens"}-${signature}.${extension}`;
+      }
+
+      function updateEmailLink() {
+        const name = nameInput.value.trim() || "Daniel Sage";
+        const subject = "Intervention au Conseil communal d’Ecublens";
+        const body = `Chère Madame,\n\nVeuillez trouver ci-joint mon intervention.\n\nCordialement,\n\n${name}`;
+        emailButton.href = `mailto:Silvana.DellaVecchia@ecublens.ch?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      }
+
+      function downloadBlob(blob, name) {
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.download = name;
+        document.body.append(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      function fontForRun(run, fonts) {
+        if (run.bold && run.italic) return fonts.boldItalic;
+        if (run.bold) return fonts.bold;
+        if (run.italic) return fonts.italic;
+        return fonts.regular;
+      }
+
+      function drawRichTextOnPdf(page, data, rect, fonts) {
+        const size = data.fontSize;
+        const x = rect.x + 5;
+        const maxX = rect.x + rect.width - 5;
+        const lineHeight = size === 10 ? 10.2 : size * 1.15;
+        const top = rect.y + rect.height - 5;
+        const bottom = rect.y + 3;
+        const lines = [{ runs: [], width: 0 }];
+
+        function nextLine() {
+          lines.push({ runs: [], width: 0 });
+        }
+
+        function addPiece(text, style) {
+          if (!text) return;
+          const font = fontForRun(style, fonts);
+          const width = font.widthOfTextAtSize(text, size);
+          const line = lines[lines.length - 1];
+          const previous = line.runs[line.runs.length - 1];
+          if (previous && previous.font === font && previous.style.underline === style.underline && previous.style.strike === style.strike) {
+            previous.text += text;
+            previous.width += width;
+          } else {
+            line.runs.push({ text, width, font, style });
+          }
+          line.width += width;
+        }
+
+        for (const run of data.richRuns) {
+          for (const part of run.text.split(/(\n|\s+)/).filter(Boolean)) {
+            if (part === "\n") {
+              nextLine();
+              continue;
+            }
+            if (/^\s+$/.test(part)) {
+              const line = lines[lines.length - 1];
+              if (!line.runs.length) continue;
+              const width = fontForRun(run, fonts).widthOfTextAtSize(part, size);
+              if (x + line.width + width > maxX) nextLine();
+              else addPiece(part, run);
+              continue;
+            }
+            const font = fontForRun(run, fonts);
+            const line = lines[lines.length - 1];
+            const wordWidth = font.widthOfTextAtSize(part, size);
+            if (line.runs.length && x + line.width + wordWidth > maxX) nextLine();
+            if (wordWidth <= maxX - x) {
+              addPiece(part, run);
+              continue;
+            }
+            for (const character of part) {
+              const currentLine = lines[lines.length - 1];
+              const characterWidth = font.widthOfTextAtSize(character, size);
+              if (currentLine.runs.length && x + currentLine.width + characterWidth > maxX) nextLine();
+              addPiece(character, run);
+            }
+          }
+        }
+
+        lines.forEach((line, index) => {
+          const y = top - size - index * lineHeight;
+          if (y < bottom) throw new Error("Le texte dépasse l’espace prévu dans le formulaire officiel. Raccourcissez-le pour pouvoir le télécharger.");
+          let cursorX = x;
+          for (const run of line.runs) {
+            page.drawText(run.text, { x: cursorX, y, size, font: run.font, color: PDFLib.rgb(0, 0, 0) });
+            if (run.style.underline || run.style.strike) {
+              const lineY = run.style.underline ? y - size * 0.12 : y + size * 0.32;
+              page.drawLine({
+                start: { x: cursorX, y: lineY },
+                end: { x: cursorX + run.width, y: lineY },
+                thickness: Math.max(0.45, size / 18),
+                color: PDFLib.rgb(0, 0, 0)
+              });
+            }
+            cursorX += run.width;
+          }
+        });
+      }
+
+      async function createPdf(data, signature) {
+        if (!window.PDFLib) throw new Error("La bibliothèque PDF n’a pas pu être chargée. Vérifiez votre connexion, puis réessayez.");
+        let response;
+        try {
+          response = await fetch("./Ecublens_Formulaire_PDF_Interventions.pdf");
+        } catch {
+          throw new Error("Impossible de charger le modèle officiel. La page doit être servie par HTTP et le PDF doit être publié à côté de index.html.");
+        }
+        if (!response.ok) throw new Error("Le modèle PDF est introuvable. Vérifiez que Ecublens_Formulaire_PDF_Interventions.pdf est présent à la racine du site.");
+        let pdf;
+        try {
+          pdf = await PDFLib.PDFDocument.load(await response.arrayBuffer());
+        } catch {
+          throw new Error("Le modèle PDF n’a pas pu être lu. Vérifiez que le fichier publié est bien le formulaire officiel.");
+        }
+        const pdfForm = pdf.getForm();
+        for (const type of data.types) {
+          if (type === "Vœu" || type === "Autre") pdfForm.getCheckBox("Autre").check();
+          else pdfForm.getCheckBox(type).check();
+        }
+        pdfForm.getTextField("Ecublens le").setText(data.dateDisplay);
+        pdfForm.getTextField("Nom prénom").setText(data.name);
+        const textField = pdfForm.getTextField("Prise de note");
+        textField.setFontSize(data.fontSize);
+        textField.setText("");
+        pdfForm.getTextField("Autre type").setText(data.otherType);
+        const formField = pdfForm.getTextField("Signature");
+        formField.setText("");
+        const textRectValues = textField.acroField.dict.get(PDFLib.PDFName.of("Rect")).asArray().map(value => value.asNumber());
+        const textRect = {
+          x: textRectValues[0],
+          y: textRectValues[1],
+          width: textRectValues[2] - textRectValues[0],
+          height: textRectValues[3] - textRectValues[1]
+        };
+        pdfForm.updateFieldAppearances();
+
+        if (signature) {
+          const signatureImage = signature.type === "png"
+            ? await pdf.embedPng(signature.bytes)
+            : await pdf.embedJpg(signature.bytes);
+          formField.setImage(signatureImage);
+        }
+        pdfForm.flatten();
+        const page = pdf.getPages()[0];
+        const fonts = {
+          regular: await pdf.embedFont(PDFLib.StandardFonts.Helvetica),
+          bold: await pdf.embedFont(PDFLib.StandardFonts.HelveticaBold),
+          italic: await pdf.embedFont(PDFLib.StandardFonts.HelveticaOblique),
+          boldItalic: await pdf.embedFont(PDFLib.StandardFonts.HelveticaBoldOblique)
+        };
+        drawRichTextOnPdf(page, data, textRect, fonts);
+        return new Blob([await pdf.save()], { type: "application/pdf" });
+      }
+
+      function loadTemplateLogo() {
+        if (!templateLogoPromise) {
+          templateLogoPromise = fetch("./ecublens-logo.png").then(response => {
+            if (!response.ok) throw new Error("Le logo du formulaire officiel est introuvable. Vérifiez que ecublens-logo.png est publié à côté de index.html.");
+            return response.arrayBuffer();
+          }).then(buffer => new Uint8Array(buffer)).catch(error => {
+            templateLogoPromise = null;
+            throw error;
+          });
+        }
+        return templateLogoPromise;
+      }
+
+      async function createDocx(data, signature) {
+        if (!window.docx) throw new Error("La bibliothèque Word n’a pas pu être chargée. Vérifiez votre connexion, puis réessayez.");
+        const { Document, Packer, Paragraph, TextRun, ImageRun, Table, TableRow, TableCell, WidthType, TableLayoutType, BorderStyle, HeightRule, LineRuleType, VerticalAlign, AlignmentType, TabStopType } = window.docx;
+        const logoBytes = await loadTemplateLogo();
+        const runOptions = run => ({
+          text: run.text,
+          font: "Arial",
+          size: data.fontSize * 2,
+          bold: run.bold,
+          italics: run.italic,
+          underline: run.underline ? { type: "single" } : undefined,
+          strike: run.strike
+        });
+        const smallRun = (text, options = {}) => new TextRun({ text, font: "Arial", size: 18, ...options });
+        const textTabs = [
+          { type: TabStopType.LEFT, position: 1760 },
+          { type: TabStopType.LEFT, position: 4030 },
+          { type: TabStopType.LEFT, position: 6300 }
+        ];
+        const footerTabs = [{ type: TabStopType.LEFT, position: 4100 }];
+        const paragraphs = [[]];
+        for (const run of data.richRuns) {
+          const parts = run.text.split(/(\n)/);
+          for (const part of parts) {
+            if (part === "\n") paragraphs.push([]);
+            else if (part) paragraphs[paragraphs.length - 1].push(new TextRun(runOptions({ ...run, text: part })));
+          }
+        }
+        const bodyParagraphs = paragraphs.map(runs => new Paragraph({
+          spacing: {
+            before: 0,
+            after: 0,
+            line: Math.round((data.fontSize === 10 ? 10.2 : data.fontSize * 1.15) * 20),
+            lineRule: LineRuleType.EXACT
+          },
+          children: runs.length ? runs : [new TextRun({ text: " ", font: "Arial", size: data.fontSize * 2 })]
+        }));
+        const signatureRuns = [smallRun("\tSignature : ")];
+        if (signature) {
+          const scale = Math.min(180 / signature.width, 42 / signature.height);
+          signatureRuns.push(new ImageRun({
+            data: signature.bytes,
+            type: signature.type,
+            transformation: { width: signature.width * scale, height: signature.height * scale }
+          }));
+        }
+        const border = { style: BorderStyle.SINGLE, size: 4, color: "000000" };
+        const makeRow = (children, height) => new TableRow({
+          height: { value: height, rule: HeightRule.EXACT },
+          children: [new TableCell({
+            children,
+            width: { size: 9826, type: WidthType.DXA },
+            margins: { top: 35, bottom: 35, left: 80, right: 80 },
+            verticalAlign: VerticalAlign.TOP
+          })]
+        });
+        const formTable = new Table({
+          width: { size: 9826, type: WidthType.DXA },
+          columnWidths: [9826],
+          layout: TableLayoutType.FIXED,
+          borders: { top: border, bottom: border, left: border, right: border, insideHorizontal: border, insideVertical: border },
+          rows: [
+            makeRow([new Paragraph({
+              spacing: { before: 0, after: 0, line: 220 },
+              tabStops: textTabs,
+              children: [
+                smallRun("Type : ", { bold: true }),
+                smallRun("\t"),
+                ...["Postulat", "Motion", "Amendement"].flatMap((type, index) => [
+                  smallRun(`${data.types.includes(type) ? "☒" : "☐"} ${type}`),
+                  ...(index < 2 ? [smallRun("\t")] : [])
+                ])
+              ]
+            })], 480),
+            makeRow([new Paragraph({
+              spacing: { before: 0, after: 0, line: 220 },
+              tabStops: [{ type: TabStopType.LEFT, position: 1760 }],
+              children: [
+                smallRun("\t"),
+                smallRun(`${data.types.some(type => type === "Autre" || type === "Vœu") ? "☒" : "☐"} Autre (préciser) : `),
+                smallRun(data.otherType)
+              ]
+            })], 480),
+            makeRow(bodyParagraphs, 11100),
+            makeRow([
+              new Paragraph({
+                spacing: { before: 0, after: 60, line: 220 },
+                tabStops: footerTabs,
+                children: [smallRun("\tNom, prénom : "), smallRun(data.name)]
+              }),
+              new Paragraph({
+                spacing: { before: 0, after: 0, line: 220 },
+                tabStops: footerTabs,
+                children: signatureRuns
+              })
+            ], 1250)
+          ]
+        });
+        const children = [
+          new Paragraph({
+            spacing: { before: 0, after: 0, line: 1440 },
+            children: [new ImageRun({
+              data: logoBytes,
+              type: "png",
+              transformation: { width: 220, height: 96 }
+            })]
+          }),
+          new Paragraph({
+            alignment: AlignmentType.RIGHT,
+            spacing: { before: 0, after: 180, line: 220 },
+            children: [smallRun(`Ecublens VD, le ${data.dateDisplay}`)]
+          }),
+          formTable
+        ];
+        const document = new Document({
+          sections: [{
+            properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 660, right: 1040, bottom: 850, left: 1040 } } },
+            children
+          }]
+        });
+        return Packer.toBlob(document);
+      }
+
+      function xmlEscape(text) {
+        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+      }
+
+      function richStyleName(run) {
+        const suffix = [
+          run.bold && "Bold",
+          run.italic && "Italic",
+          run.underline && "Underline",
+          run.strike && "Strike"
+        ].filter(Boolean).join("");
+        return suffix ? `Rich${suffix}` : "";
+      }
+
+      function odtRichText(runs) {
+        return runs.map(run => {
+          if (run.text === "\n") return "<text:line-break/>";
+          const text = xmlEscape(run.text);
+          const style = richStyleName(run);
+          return style ? `<text:span text:style-name="${style}">${text}</text:span>` : text;
+        }).join("") || " ";
+      }
+
+      async function createOdt(data, signature) {
+        if (!window.JSZip) throw new Error("La bibliothèque LibreOffice n’a pas pu être chargée. Vérifiez votre connexion, puis réessayez.");
+        const zip = new JSZip();
+        const logoBytes = await loadTemplateLogo();
+        const stylesForRuns = [...new Set(data.richRuns.map(richStyleName).filter(Boolean))].map(style => {
+          const props = style.slice(4);
+          const textProps = [
+            props.includes("Bold") ? 'fo:font-weight="bold"' : "",
+            props.includes("Italic") ? 'fo:font-style="italic"' : "",
+            props.includes("Underline") ? 'style:text-underline-style="solid"' : "",
+            props.includes("Strike") ? 'style:text-line-through-style="solid"' : ""
+          ].filter(Boolean).join(" ");
+          return `<style:style style:name="${style}" style:family="text"><style:text-properties ${textProps}/></style:style>`;
+        }).join("");
+        const other = xmlEscape(data.otherType);
+        const dateText = `Ecublens VD, le ${data.dateDisplay}`;
+        const bodyLineHeight = data.fontSize === 10 ? "10.2pt" : `${(data.fontSize * 1.15).toFixed(2)}pt`;
+        const checked = type => data.types.includes(type) ? "☒" : "☐";
+        const otherChecked = data.types.some(type => type === "Autre" || type === "Vœu") ? "☒" : "☐";
+        const signatureFrame = signature
+          ? `<draw:frame draw:name="Signature" text:anchor-type="as-char" svg:width="4.8cm" svg:height="1.1cm"><draw:image xlink:href="Pictures/signature.${signature.type}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/></draw:frame>`
+          : "";
+        const content = `<?xml version="1.0" encoding="UTF-8"?>
+<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" office:version="1.3">
+  <office:automatic-styles>
+    <style:style style:name="Meta" style:family="paragraph"><style:paragraph-properties fo:margin="0cm"/><style:text-properties fo:font-family="Arial" fo:font-size="9pt"/></style:style>
+    <style:style style:name="Date" style:family="paragraph"><style:paragraph-properties fo:text-align="end" fo:margin="0cm"/><style:text-properties fo:font-family="Arial" fo:font-size="9pt"/></style:style>
+    <style:style style:name="HeaderGap" style:family="paragraph"><style:paragraph-properties fo:line-height="0.2cm" fo:margin="0cm"/><style:text-properties fo:font-size="1pt"/></style:style>
+    <style:style style:name="Body" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="${bodyLineHeight}"/><style:text-properties fo:font-family="Arial" fo:font-size="${data.fontSize}pt"/></style:style>
+    <style:style style:name="FormLine" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="0.38cm"><style:tab-stops><style:tab-stop style:position="3.1cm" style:type="left"/><style:tab-stop style:position="7.1cm" style:type="left"/><style:tab-stop style:position="11.1cm" style:type="left"/></style:tab-stops></style:paragraph-properties><style:text-properties fo:font-family="Arial" fo:font-size="9pt"/></style:style>
+    <style:style style:name="OtherLine" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="0.38cm"><style:tab-stops><style:tab-stop style:position="3.1cm" style:type="left"/></style:tab-stops></style:paragraph-properties><style:text-properties fo:font-family="Arial" fo:font-size="9pt"/></style:style>
+    <style:style style:name="FooterLine" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="0.38cm"><style:tab-stops><style:tab-stop style:position="7.2cm" style:type="left"/></style:tab-stops></style:paragraph-properties><style:text-properties fo:font-family="Arial" fo:font-size="9pt"/></style:style>
+    <style:style style:name="FormTable" style:family="table"><style:table-properties style:width="17.32cm" table:align="margins"/></style:style>
+    <style:style style:name="HeaderTable" style:family="table"><style:table-properties style:width="17.32cm" table:align="margins"/></style:style>
+    <style:style style:name="HeaderColumn" style:family="table-column"><style:table-column-properties style:column-width="8.66cm"/></style:style>
+    <style:style style:name="FormColumn" style:family="table-column"><style:table-column-properties style:column-width="17.32cm"/></style:style>
+    <style:style style:name="HeaderCell" style:family="table-cell"><style:table-cell-properties fo:border="none" fo:padding="0cm" fo:vertical-align="middle"/></style:style>
+    <style:style style:name="FormCell" style:family="table-cell"><style:table-cell-properties fo:border="0.5pt solid #000000" fo:padding="0.08cm 0.16cm" fo:vertical-align="middle"/></style:style>
+    <style:style style:name="BodyCell" style:family="table-cell"><style:table-cell-properties fo:border="0.5pt solid #000000" fo:padding="0.12cm 0.16cm" fo:vertical-align="top"/></style:style>
+    <style:style style:name="TopRow" style:family="table-row"><style:table-row-properties style:row-height="0.85cm" style:use-optimal-row-height="false"/></style:style>
+    <style:style style:name="BodyRow" style:family="table-row"><style:table-row-properties style:row-height="19.6cm" style:use-optimal-row-height="false"/></style:style>
+    <style:style style:name="FooterRow" style:family="table-row"><style:table-row-properties style:row-height="2.2cm" style:use-optimal-row-height="false"/></style:style>
+    ${stylesForRuns}
+  </office:automatic-styles>
+  <office:body><office:text>
+    <table:table table:name="Header" table:style-name="HeaderTable">
+      <table:table-column table:style-name="HeaderColumn"/><table:table-column table:style-name="HeaderColumn"/>
+      <table:table-row><table:table-cell table:style-name="HeaderCell"><text:p text:style-name="Meta"><draw:frame draw:name="EcublensLogo" text:anchor-type="as-char" svg:width="5.82cm" svg:height="2.54cm"><draw:image xlink:href="Pictures/ecublens-logo.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/></draw:frame></text:p></table:table-cell><table:table-cell table:style-name="HeaderCell"><text:p text:style-name="Meta"/></table:table-cell></table:table-row>
+      <table:table-row><table:table-cell table:style-name="HeaderCell"><text:p text:style-name="Meta"/></table:table-cell><table:table-cell table:style-name="HeaderCell"><text:p text:style-name="Date">${xmlEscape(dateText)}</text:p></table:table-cell></table:table-row>
+    </table:table>
+    <text:p text:style-name="HeaderGap"><text:s/></text:p>
+    <table:table table:name="InterventionForm" table:style-name="FormTable">
+      <table:table-column table:style-name="FormColumn"/>
+      <table:table-row table:style-name="TopRow"><table:table-cell table:style-name="FormCell"><text:p text:style-name="FormLine"><text:span text:style-name="Bold">Type : </text:span><text:tab/>${checked("Postulat")} Postulat<text:tab/>${checked("Motion")} Motion<text:tab/>${checked("Amendement")} Amendement</text:p></table:table-cell></table:table-row>
+      <table:table-row table:style-name="TopRow"><table:table-cell table:style-name="FormCell"><text:p text:style-name="OtherLine"><text:tab/>${otherChecked} Autre (préciser) : ${other}</text:p></table:table-cell></table:table-row>
+      <table:table-row table:style-name="BodyRow"><table:table-cell table:style-name="BodyCell"><text:p text:style-name="Body">${odtRichText(data.richRuns)}</text:p></table:table-cell></table:table-row>
+      <table:table-row table:style-name="FooterRow"><table:table-cell table:style-name="FormCell"><text:p text:style-name="FooterLine"><text:tab/>Nom, prénom : ${xmlEscape(data.name)}</text:p><text:p text:style-name="FooterLine"><text:tab/>Signature : ${signatureFrame}</text:p></table:table-cell></table:table-row>
+    </table:table>
+  </office:text></office:body>
+</office:document-content>`;
+        const styles = `<?xml version="1.0" encoding="UTF-8"?>
+<office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" office:version="1.3"><office:styles/><office:automatic-styles><style:page-layout style:name="Page"><style:page-layout-properties fo:page-width="21cm" fo:page-height="29.7cm" style:print-orientation="portrait" fo:margin-top="1.1cm" fo:margin-bottom="1.5cm" fo:margin-left="1.84cm" fo:margin-right="1.84cm"/></style:page-layout></office:automatic-styles><office:master-styles><style:master-page style:name="Default" style:page-layout-name="Page"/></office:master-styles></office:document-styles>`;
+        const manifest = `<?xml version="1.0" encoding="UTF-8"?>
+<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.3"><manifest:file-entry manifest:full-path="/" manifest:media-type="application/vnd.oasis.opendocument.text"/><manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/><manifest:file-entry manifest:full-path="styles.xml" manifest:media-type="text/xml"/><manifest:file-entry manifest:full-path="Pictures/ecublens-logo.png" manifest:media-type="image/png"/>${signature ? `<manifest:file-entry manifest:full-path="Pictures/signature.${signature.type}" manifest:media-type="${signature.type === "png" ? "image/png" : "image/jpeg"}"/>` : ""}</manifest:manifest>`;
+        zip.file("mimetype", "application/vnd.oasis.opendocument.text", { compression: "STORE" });
+        zip.file("content.xml", content);
+        zip.file("styles.xml", styles);
+        zip.file("META-INF/manifest.xml", manifest);
+        zip.file("Pictures/ecublens-logo.png", logoBytes);
+        if (signature) zip.file(`Pictures/signature.${signature.type}`, signature.bytes);
+        return zip.generateAsync({ type: "blob", mimeType: "application/vnd.oasis.opendocument.text" });
+      }
+
+      async function generateAndDownload() {
+        if (!updateFormState()) return;
+        busy = true;
+        updateFormState();
+        setStatus("Génération du document…");
+        try {
+          const data = getFormData();
+          const formats = selectedFormats();
+          const signature = formats.some(format => format.endsWith(":with")) ? await readSignature() : null;
+          if (formats.some(format => !format.startsWith("pdf:"))) await createPdf(data, null);
+          const outputs = [];
+          for (const choice of formats) {
+            const [format, signatureMode] = choice.split(":");
+            const includesSignature = signatureMode === "with";
+            let blob;
+            if (format === "pdf") blob = await createPdf(data, includesSignature ? signature : null);
+            else if (format === "docx") blob = await createDocx(data, includesSignature ? signature : null);
+            else if (format === "odt") blob = await createOdt(data, includesSignature ? signature : null);
+            outputs.push({
+              blob,
+              name: filename(data, format, includesSignature)
+            });
+          }
+          for (const output of outputs) {
+            downloadBlob(output.blob, output.name);
+            await new Promise(resolve => window.setTimeout(resolve, 250));
+          }
+          setStatus(`${outputs.length} fichier${outputs.length > 1 ? "s" : ""} téléchargé${outputs.length > 1 ? "s" : ""}. Autorisez les téléchargements multiples si votre navigateur le demande.`, "success");
+        } catch (error) {
+          setStatus(error instanceof Error ? error.message : "Le document n’a pas pu être généré.", "error");
+        } finally {
+          busy = false;
+          updateFormState();
+        }
+      }
+
+      form.addEventListener("input", () => {
+        updateOtherTypeError();
+        updateFormState();
+      });
+      form.addEventListener("change", () => {
+        updateOtherTypeError();
+        updateFormState();
+      });
+
+      for (const button of formatTools) {
+        button.addEventListener("mousedown", event => event.preventDefault());
+        button.addEventListener("click", () => {
+          richEditor.focus();
+          document.execCommand(button.dataset.command, false);
+          updateToolbarState();
+          updateFormState();
+        });
+      }
+
+      function updateToolbarState() {
+        for (const button of formatTools) {
+          button.setAttribute("aria-pressed", String(document.queryCommandState(button.dataset.command)));
+        }
+      }
+
+      richEditor.addEventListener("keydown", event => {
+        if (!event.metaKey && !event.ctrlKey) return;
+        const key = event.key.toLowerCase();
+        const command = key === "b" ? "bold" :
+          key === "i" ? "italic" :
+          key === "u" ? "underline" :
+          key === "x" && event.shiftKey ? "strikeThrough" : null;
+        if (!command) return;
+        event.preventDefault();
+        document.execCommand(command, false);
+        updateToolbarState();
+        updateFormState();
+      });
+      richEditor.addEventListener("keyup", updateToolbarState);
+      richEditor.addEventListener("mouseup", updateToolbarState);
+
+      signatureInput.addEventListener("change", () => {
+        const file = signatureInput.files && signatureInput.files[0];
+        if (!file) return;
+        if (!["image/png", "image/jpeg"].includes(file.type)) {
+          signatureError.textContent = "Choisissez une image au format PNG ou JPEG.";
+          signatureInput.value = "";
+          return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          signatureError.textContent = "L’image dépasse la taille maximale de 5 Mo.";
+          signatureInput.value = "";
+          return;
+        }
+        if (signatureUrl) URL.revokeObjectURL(signatureUrl);
+        const url = URL.createObjectURL(file);
+        const image = new Image();
+        image.onload = () => {
+          URL.revokeObjectURL(url);
+          if (!image.naturalWidth || !image.naturalHeight) {
+            signatureError.textContent = "Cette image ne peut pas être lue. Choisissez un autre fichier PNG ou JPEG.";
+            return;
+          }
+          signatureDimensions = { width: image.naturalWidth, height: image.naturalHeight };
+          setSignature(file);
+        };
+        image.onerror = () => {
+          URL.revokeObjectURL(url);
+          signatureError.textContent = "Cette image ne peut pas être lue. Choisissez un autre fichier PNG ou JPEG.";
+        };
+        image.src = url;
+      });
+
+      removeSignatureButton.addEventListener("click", () => {
+        setSignature(null);
+        signatureInput.focus();
+      });
+
+      downloadButton.addEventListener("click", generateAndDownload);
+
+      updateFormState();
+    })();
+  </script>
+</body>
+</html>
