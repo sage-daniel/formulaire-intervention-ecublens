@@ -513,7 +513,7 @@
             <textarea id="email-message" rows="6"></textarea>
           </div>
         </div>
-        <p class="hint">Le partage des fichiers dépend de votre navigateur. Si les pièces jointes ne peuvent pas être transmises directement, les fichiers seront téléchargés pour être ajoutés au brouillon de votre messagerie.</p>
+        <p class="hint">Le menu de partage peut joindre les fichiers, mais ne garantit pas les champs « À » et « Objet ». Vérifiez-les avant l’envoi. Si le partage n’est pas disponible, les fichiers seront téléchargés et un brouillon de message sera ouvert.</p>
         <p class="status" id="status" role="status" aria-live="polite"></p>
         <p class="privacy">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 5.5 6v5.1c0 4.3 2.7 8.2 6.5 9.9 3.8-1.7 6.5-5.6 6.5-9.9V6L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -767,8 +767,14 @@
           month: "2-digit",
           year: "numeric"
         }).format(subjectDate);
-        const subjectParts = [type, nameInput.value.trim(), formattedDate].filter(Boolean);
-        if (!emailSubjectEdited) emailSubjectInput.value = subjectParts.join(" ");
+        const subjectParts = [
+          "Intervention",
+          type,
+          "Conseil Communal d'Ecublens",
+          nameInput.value.trim(),
+          formattedDate
+        ].filter(Boolean);
+        if (!emailSubjectEdited) emailSubjectInput.value = subjectParts.join(" | ");
         if (!emailMessageEdited) {
           emailMessageInput.value = `Chère Madame,\n\nVeuillez trouver ci-joint mon intervention.\n\nCordialement,\n\n${nameInput.value.trim()}`;
         }
@@ -1337,7 +1343,7 @@
                 title: emailSubjectInput.value,
                 text: `À : ${recipients.join(", ")}\n\n${emailMessageInput.value}`
               });
-              setStatus("Les documents ont été transmis au menu de partage. Choisissez votre application de messagerie et vérifiez les destinataires.", "success");
+              setStatus("Documents transmis au menu de partage. Le destinataire est indiqué dans le texte, pas nécessairement dans « À », et l’objet peut ne pas être repris. Vérifiez ces champs avant l’envoi.", "success");
               return;
             } catch (error) {
               if (error && error.name === "AbortError") {
