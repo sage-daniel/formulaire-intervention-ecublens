@@ -38,9 +38,7 @@
     button { cursor: pointer; }
 
     .masthead {
-      color: #fff;
-      background: var(--blue);
-      border-bottom: 4px solid var(--gold);
+      color: var(--ink);
     }
 
     .masthead-inner, main, .footer-inner {
@@ -53,8 +51,12 @@
       align-items: flex-start;
       flex-direction: column;
       gap: 5px;
-      min-height: 118px;
-      padding-block: 16px;
+      min-height: 0;
+      padding: 12px 18px;
+      border-top: 4px solid var(--red);
+      border-bottom: 4px solid var(--gold);
+      background: var(--blue);
+      color: #fff;
     }
 
     .brand { min-width: 0; }
@@ -335,13 +337,10 @@
     .status[data-state="success"] { color: var(--success); }
 
     .privacy {
-      display: flex;
-      gap: 9px;
       margin: 17px 0 0;
       color: #617488;
       font-size: 12px;
     }
-    .privacy svg { width: 16px; height: 16px; flex: 0 0 16px; margin-top: 2px; color: var(--success); }
     footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
     .footer-inner { padding-block: 19px 24px; }
 
@@ -352,7 +351,7 @@
     }
     @media (max-width: 520px) {
       .masthead-inner, main, .footer-inner { width: min(100% - 28px, 920px); }
-      .masthead-inner { min-height: 118px; }
+      .masthead-inner { min-height: 0; }
       .brand-meta { flex-direction: column; gap: 1px; }
       main { padding-block: 26px 38px; }
       .field-grid { grid-template-columns: 1fr; gap: 16px; }
@@ -493,13 +492,13 @@
             </div>
           </div>
         </fieldset>
-        <p class="hint" id="format-hint">Chaque case génère un fichier distinct. Si plusieurs sont cochées, autorisez les téléchargements multiples si votre navigateur le demande.</p>
+        <p class="hint" id="format-hint">Chaque case génère un fichier distinct.</p>
         <div class="email-fields">
           <h2 class="email-heading">Préparation de l’e-mail</h2>
           <div class="field">
             <label for="email-recipients">Destinataire(s) <span class="required" aria-hidden="true">*</span></label>
             <div class="recipient-row">
-              <input id="email-recipients" type="text" maxlength="1000" required aria-describedby="email-recipients-hint" value="Silvana.DellaVecchia@ecublens.ch">
+              <input id="email-recipients" type="text" maxlength="1000" required aria-describedby="email-recipients-hint">
               <button class="email-button" id="prepare-email" type="button" disabled>Prepare Email</button>
             </div>
             <p class="hint" id="email-recipients-hint">Séparez plusieurs adresses par une virgule ou un point-virgule.</p>
@@ -513,10 +512,8 @@
             <textarea id="email-message" rows="6"></textarea>
           </div>
         </div>
-        <p class="hint">Le menu de partage peut joindre les fichiers, mais ne garantit pas les champs « À » et « Objet ». Vérifiez-les avant l’envoi. Si le partage n’est pas disponible, les fichiers seront téléchargés et un brouillon de message sera ouvert.</p>
         <p class="status" id="status" role="status" aria-live="polite"></p>
         <p class="privacy">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 5.5 6v5.1c0 4.3 2.7 8.2 6.5 9.9 3.8-1.7 6.5-5.6 6.5-9.9V6L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span>Vos informations et votre signature restent dans votre navigateur. Elles ne sont ni enregistrées sur ce site ni envoyées à un serveur. Le document est généré sur votre appareil.</span>
         </p>
       </form>
@@ -564,6 +561,7 @@
       let busy = false;
       let emailSubjectEdited = false;
       let emailMessageEdited = false;
+      let emailDefaultBody = null;
       let templateBackgroundPromise = null;
 
       function selectedTypes() {
@@ -605,7 +603,7 @@
 
         function append(text, style) {
           if (!text) return;
-          const parts = text.split(/(\n)/);
+          const parts = text.replace(/\r\n?/g, "\n").split(/(\n)/);
           for (const part of parts) {
             if (!part) continue;
             const previous = segments[segments.length - 1];
@@ -618,7 +616,7 @@
           if (segments.length && !segments[segments.length - 1].text.endsWith("\n")) append("\n", style);
         }
 
-        function visit(node, style, root = false) {
+        function visit(node, style) {
           if (node.nodeType === Node.TEXT_NODE) {
             append(node.nodeValue, style);
             return;
@@ -629,7 +627,7 @@
             append("\n", style);
             return;
           }
-          const block = !root && ["div", "p", "li"].includes(tag);
+          const block = ["div", "p", "li"].includes(tag);
           if (block) ensureLineBreak(style);
           const next = {
             bold: style.bold || ["b", "strong"].includes(tag),
@@ -641,7 +639,7 @@
           if (block) ensureLineBreak(style);
         }
 
-        for (const child of richEditor.childNodes) visit(child, initialStyle, true);
+        for (const child of richEditor.childNodes) visit(child, initialStyle);
         const text = segments.map(segment => segment.text).join("");
         const trimmed = text.trim();
         if (!trimmed) return [];
@@ -773,7 +771,32 @@
         if (!emailMessageEdited) {
           const subjectLine = emailSubjectInput.value.trim();
           const subjectText = subjectLine ? `Objet : ${subjectLine}\n\n` : "";
-          emailMessageInput.value = `${subjectText}Chère Madame,\n\nVeuillez trouver ci-joint mon intervention.\n\nCordialement,\n\n${nameInput.value.trim()}`;
+          if (emailDefaultBody !== null) {
+            const sender = nameInput.value.trim() || "Daniel Sage";
+            const message = emailDefaultBody.replace(/Daniel Sage/g, () => sender);
+            emailMessageInput.value = `${subjectText}${message}`;
+          }
+        }
+      }
+
+      async function loadEmailDefaults() {
+        try {
+          const [bodyResponse, recipientsResponse] = await Promise.all([
+            fetch("./email-body.txt"),
+            fetch("./email-recipients.txt")
+          ]);
+          if (!bodyResponse.ok) throw new Error("Le fichier email-body.txt est introuvable.");
+          if (!recipientsResponse.ok) throw new Error("Le fichier email-recipients.txt est introuvable.");
+          const [body, recipients] = await Promise.all([bodyResponse.text(), recipientsResponse.text()]);
+          if (!body.trim()) throw new Error("Le fichier email-body.txt est vide.");
+          if (!recipients.trim()) throw new Error("Le fichier email-recipients.txt est vide.");
+          emailDefaultBody = body.replace(/\r\n?/g, "\n").trimEnd();
+          if (!emailRecipientInput.value.trim()) emailRecipientInput.value = recipients.trim();
+          updateEmailDraft();
+          updateFormState();
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Erreur inconnue.";
+          setStatus(`Les paramètres e-mail n’ont pas pu être chargés : ${message}`, "error");
         }
       }
 
@@ -1162,12 +1185,13 @@
       }
 
       function odtRichText(runs) {
-        return runs.map(run => {
-          if (run.text === "\n") return "<text:line-break/>";
-          const text = xmlEscape(run.text);
+        return runs.map(run => run.text.replace(/\r\n?/g, "\n").split(/(\n)/).map(part => {
+          if (part === "\n") return "<text:line-break/>";
+          if (!part) return "";
+          const text = xmlEscape(part);
           const style = richStyleName(run);
           return style ? `<text:span text:style-name="${style}">${text}</text:span>` : text;
-        }).join("") || " ";
+        }).join("")).join("") || " ";
       }
 
       async function createOdt(data, signature) {
@@ -1318,7 +1342,7 @@
         try {
           const outputs = await generateOutputs(getFormData(), selectedFormats());
           await downloadOutputs(outputs);
-          setStatus(`${outputs.length} fichier${outputs.length > 1 ? "s" : ""} téléchargé${outputs.length > 1 ? "s" : ""}. Autorisez les téléchargements multiples si votre navigateur le demande.`, "success");
+          setStatus("Téléchargement terminé.", "success");
         } catch (error) {
           setStatus(error instanceof Error ? error.message : "Le document n’a pas pu être généré.", "error");
         } finally {
@@ -1452,6 +1476,7 @@
       emailMessageInput.addEventListener("input", () => { emailMessageEdited = true; });
       updateEmailDraft();
       updateFormState();
+      loadEmailDefaults();
     })();
   </script>
 </body>
