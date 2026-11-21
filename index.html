@@ -352,6 +352,7 @@
     .email-button:hover:not(:disabled) { background: #f1f3fc; }
     .email-button:disabled { cursor: not-allowed; opacity: .48; }
     .email-fields { display: grid; gap: 12px; margin: 20px 0 0; }
+    .email-heading { margin: 0; color: var(--blue-dark); font-size: 17px; }
     .email-fields textarea {
       width: 100%;
       min-height: 150px;
@@ -398,7 +399,6 @@
   <header class="masthead">
     <div class="masthead-inner">
       <div class="brand">
-        <p class="brand-kicker">CONSEIL COMMUNAL ECUBLENS</p>
         <div class="brand-meta">
           <p>Daniel Sage (<a href="mailto:daniel@sage.li">daniel@sage.li</a>)</p>
           <p>Date : 20 Novembre 2026</p>
@@ -409,7 +409,6 @@
 
   <main>
     <section class="intro" aria-labelledby="page-title">
-      <p class="eyebrow">Conseil communal Ecublens</p>
       <h1 id="page-title">Le hack simple pour faire une intervention dans le formulaire officiel</h1>
     </section>
 
@@ -520,12 +519,13 @@
         </fieldset>
         <p class="hint" id="format-hint">Chaque case génère un fichier distinct. Si plusieurs sont cochées, autorisez les téléchargements multiples si votre navigateur le demande.</p>
         <div class="email-fields">
+          <h2 class="email-heading">Préparation de l’e-mail</h2>
           <div class="field">
-            <label for="email-subject">Objet du message</label>
+            <label for="email-subject">Sujet de l’e-mail</label>
             <input id="email-subject" type="text" maxlength="240">
           </div>
           <div class="field">
-            <label for="email-message">Message</label>
+            <label for="email-message">Corps de l’e-mail</label>
             <textarea id="email-message" rows="6"></textarea>
           </div>
         </div>
@@ -912,7 +912,7 @@
           else pdfForm.getCheckBox(type).check();
         }
         pdfForm.getTextField("Ecublens le").setText(data.dateDisplay);
-        pdfForm.getTextField("Nom prénom").setText(data.name);
+        pdfForm.getTextField("Nom prénom").setText("");
         const textField = pdfForm.getTextField("Prise de note");
         textField.setFontSize(data.fontSize);
         textField.setText("");
@@ -928,11 +928,11 @@
         };
         pdfForm.updateFieldAppearances();
 
+        let signatureImage = null;
         if (signature) {
-          const signatureImage = signature.type === "png"
+          signatureImage = signature.type === "png"
             ? await pdf.embedPng(signature.bytes)
             : await pdf.embedJpg(signature.bytes);
-          formField.setImage(signatureImage);
         }
         pdfForm.flatten();
         const page = pdf.getPages()[0];
@@ -942,11 +942,14 @@
           italic: await pdf.embedFont(PDFLib.StandardFonts.HelveticaOblique),
           boldItalic: await pdf.embedFont(PDFLib.StandardFonts.HelveticaBoldOblique)
         };
-        page.drawRectangle({
+        const nameLabelRect = {
           x: 254.8,
           y: 841.92 - 737.864 - 17.107,
-          width: 74.4,
-          height: 17.107,
+          width: 77,
+          height: 17.107
+        };
+        page.drawRectangle({
+          ...nameLabelRect,
           color: PDFLib.rgb(1, 1, 1)
         });
         page.drawText("Prénom, nom :", {
@@ -956,6 +959,37 @@
           font: fonts.regular,
           color: PDFLib.rgb(0, 0, 0)
         });
+        if (data.name) {
+          const nameX = 332.5;
+          const nameFontSize = Math.min(9, (541.398 - nameX - 2) * 9 / fonts.regular.widthOfTextAtSize(data.name, 9));
+          page.drawText(data.name, {
+            x: nameX,
+            y: 841.92 - 752.77,
+            size: nameFontSize,
+            font: fonts.regular,
+            color: PDFLib.rgb(0, 0, 0)
+          });
+        }
+        if (signatureImage && signature) {
+          const signatureRect = {
+            x: 317.381,
+            y: 841.92 - (759.42 + 30),
+            width: 224.017,
+            height: 30
+          };
+          const scale = Math.min(
+            signatureRect.width / signature.width,
+            signatureRect.height / signature.height
+          );
+          const width = signature.width * scale;
+          const height = signature.height * scale;
+          page.drawImage(signatureImage, {
+            x: signatureRect.x + (signatureRect.width - width) / 2,
+            y: signatureRect.y + (signatureRect.height - height) / 2,
+            width,
+            height
+          });
+        }
         drawRichTextOnPdf(page, data, textRect, fonts);
         return new Blob([await pdf.save()], { type: "application/pdf" });
       }
@@ -1003,7 +1037,7 @@
           floating: imagePosition(0, 0, 0)
         });
         const positionedImages = [backgroundImage];
-        const signatureRect = { x: 317.381, y: 756.959, width: 224.017, height: 17.107 };
+        const signatureRect = { x: 317.381, y: 759.42, width: 224.017, height: 30 };
         if (signature) {
           const scale = Math.min(
             toPixels(signatureRect.width) / signature.width,
@@ -1186,7 +1220,7 @@
           transformation: { width: toPixels(pageWidth), height: toPixels(pageHeight) },
           floating: positionImage(0, 0, 0)
         })];
-        const signatureRect = { x: 317.381, y: 756.959, width: 224.017, height: 17.107 };
+        const signatureRect = { x: 317.381, y: 759.42, width: 224.017, height: 30 };
         if (signature) {
           const scale = Math.min(
             toPixels(signatureRect.width) / signature.width,
@@ -1198,7 +1232,7 @@
             data: signature.bytes,
             type: signature.type,
             transformation: { width, height },
-            floating: positionImage(signatureRect.x, signatureRect.y + (signatureRect.height - height * 0.75) / 2, 1)
+            floating: positionImage(signatureRect.x, signatureRect.y + (signatureRect.height - height) / 2, 1)
           }));
         }
         const document = new Document({
@@ -1443,8 +1477,9 @@
         const bodyRect = { x: 54.855, y: 177.056, width: 486.221, height: 553.168 };
         const nameRect = { x: 329.719, y: 737.864, width: 211.679, height: 17.107 };
         const nameLabelRect = { x: 255.17, y: 737.864, width: 74.4, height: 17.107 };
-        const signatureRect = { x: 317.381, y: 756.959, width: 224.017, height: 17.107 };
+        const signatureRect = { x: 317.381, y: 759.42, width: 224.017, height: 30 };
         const bodyLineHeight = data.fontSize === 10 ? "10.2pt" : `${(data.fontSize * 1.15).toFixed(2)}pt`;
+        const bodyTextOffsetY = 15;
         const backgroundFrame = frame(
           "TemplateBackground", 0, 0, pageWidth, pageHeight, "TemplateBackgroundFrame",
           `<draw:image xlink:href="Pictures/template-formulaire.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>`,
@@ -1455,7 +1490,13 @@
           bodyRect,
           odtRichText(data.richRuns),
           "Body",
-          { x: bodyRect.x + 5, y: bodyRect.y + 5, width: bodyRect.width - 10, height: bodyRect.height - 8, frameStyle: "BodyFrame" }
+          {
+            x: bodyRect.x + 5,
+            y: bodyRect.y + 5 + bodyTextOffsetY,
+            width: bodyRect.width - 10,
+            height: bodyRect.height - 8 - bodyTextOffsetY,
+            frameStyle: "BodyFrame"
+          }
         );
         const signatureImage = signature
           ? (() => {
