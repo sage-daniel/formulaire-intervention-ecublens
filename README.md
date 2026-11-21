@@ -1,4 +1,4 @@
-# Le hack simple pour faire une intervention dans le formulaire officiel
+# Hack pour préparer les interventions dans le formulaire officiel
 
 **Auteur :** Daniel Sage
 

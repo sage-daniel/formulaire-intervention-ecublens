@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#2651d4">
-  <meta name="description" content="Le hack simple pour faire une intervention dans le formulaire officiel du Conseil communal d’Ecublens.">
-  <title>Conseil communal Ecublens — Le hack simple pour faire une intervention dans le formulaire officiel</title>
+  <meta name="description" content="Hack pour préparer les interventions dans le formulaire officiel du Conseil communal d’Ecublens.">
+  <title>Conseil communal Ecublens — Hack pour préparer les interventions dans le formulaire officiel</title>
   <style>
     :root {
       color-scheme: light;
@@ -58,14 +58,6 @@
     }
 
     .brand { min-width: 0; }
-    .brand-kicker {
-      margin: 0;
-      color: var(--gold);
-      font-size: clamp(14px, 2.4vw, 19px);
-      font-weight: 750;
-      letter-spacing: .035em;
-      line-height: 1.3;
-    }
     .brand-meta { display: flex; flex-wrap: wrap; gap: 7px 22px; color: #eaf0f5; font-size: 13px; }
     .brand-meta p { margin: 0; }
     .brand-meta a { color: #fff; text-underline-offset: 3px; }
@@ -73,14 +65,6 @@
     main { padding-block: 38px 56px; }
 
     .intro { margin-bottom: 24px; }
-    .eyebrow {
-      margin: 0 0 7px;
-      color: var(--red);
-      font-size: 11px;
-      font-weight: 780;
-      letter-spacing: .13em;
-      text-transform: uppercase;
-    }
     h1 {
       margin: 0;
       color: var(--blue-dark);
@@ -148,7 +132,6 @@
       padding: 0;
       border: 0;
     }
-    .types legend { grid-column: 1 / -1; margin: 0 0 -3px; padding: 0; }
     .type-option {
       display: flex;
       align-items: center;
@@ -274,32 +257,15 @@
     .upload-error { margin: 8px 0 0; color: var(--red); font-size: 12px; }
     .signature-field { margin-top: 12px; }
 
-    .choice-group {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin: 0;
-      padding: 0;
-      border: 0;
-    }
-    .choice-group legend { grid-column: 1 / -1; margin: 0 0 2px; padding: 0; }
-    .choice-option {
+    .download-heading {
       display: flex;
       align-items: center;
-      gap: 9px;
-      min-height: 43px;
-      padding: 9px 12px;
-      border: 1px solid #cbd0d9;
-      border-radius: 0;
-      background: #fff;
-      color: #323943;
-      font-size: 13px;
-      font-weight: 650;
-      cursor: pointer;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 20px;
     }
-    .choice-option:has(input:checked) { border-color: var(--blue); background: #f1f3fc; }
-    .choice-option input { width: 16px; height: 16px; margin: 0; accent-color: var(--blue); }
-    .format-choices { display: block; margin-top: 20px; }
+    .download-heading .field-label { margin: 0; }
+    .format-choices { display: block; margin-top: 0; padding: 0; border: 0; }
     .download-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 11px; }
     .download-card {
       display: grid;
@@ -314,14 +280,13 @@
     .download-choice input { width: 15px; height: 15px; margin: 0; accent-color: var(--blue); }
     .download-choice input:disabled { cursor: not-allowed; }
     .download-choice:has(input:disabled) { color: #9aa8b6; cursor: not-allowed; }
-    .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
     .download {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 9px;
       min-height: 50px;
-      margin-top: 20px;
+      margin-top: 0;
       padding: 12px 20px;
       border: 0;
       border-radius: 0;
@@ -353,6 +318,9 @@
     .email-button:disabled { cursor: not-allowed; opacity: .48; }
     .email-fields { display: grid; gap: 12px; margin: 20px 0 0; }
     .email-heading { margin: 0; color: var(--blue-dark); font-size: 17px; }
+    .recipient-row { display: flex; align-items: stretch; gap: 12px; }
+    .recipient-row input { flex: 1; min-width: 0; }
+    .recipient-row .email-button { min-height: 46px; margin-top: 0; }
     .email-fields textarea {
       width: 100%;
       min-height: 150px;
@@ -389,6 +357,9 @@
       main { padding-block: 26px 38px; }
       .field-grid { grid-template-columns: 1fr; gap: 16px; }
       .download-grid { grid-template-columns: 1fr; }
+      .download-heading { align-items: stretch; flex-direction: column; }
+      .recipient-row { flex-direction: column; }
+      .recipient-row .email-button { width: 100%; }
       .text-heading { align-items: flex-start; flex-direction: column; gap: 2px; }
       .rich-editor { min-height: 220px; }
     }
@@ -408,7 +379,7 @@
 
   <main>
     <section class="intro" aria-labelledby="page-title">
-      <h1 id="page-title">Le hack simple pour faire une intervention dans le formulaire officiel</h1>
+      <h1 id="page-title">Hack pour préparer les interventions dans le formulaire officiel</h1>
     </section>
 
     <aside class="notice" role="note" aria-label="Avertissement">
@@ -420,16 +391,15 @@
 
     <section class="card" aria-label="Formulaire">
       <form id="intervention-form">
-        <fieldset class="types" aria-describedby="type-hint">
-          <legend class="field-label">Type d’intervention <span class="required" aria-hidden="true">*</span></legend>
+        <fieldset class="types" aria-label="Types d’intervention" aria-describedby="type-hint">
           <label class="type-option"><input type="checkbox" name="type" value="Postulat">Postulat</label>
           <label class="type-option"><input type="checkbox" name="type" value="Motion">Motion</label>
           <label class="type-option"><input type="checkbox" name="type" value="Amendement">Amendement</label>
           <label class="type-option"><input type="checkbox" name="type" value="Vœu">Vœu</label>
           <label class="type-option"><input type="checkbox" name="type" value="Autre">Autre</label>
-          <label class="type-option"><input type="checkbox" name="type" value="Questions">Questions</label>
+          <label class="type-option"><input type="checkbox" name="type" value="Question">Question</label>
         </fieldset>
-        <p class="hint" id="type-hint">Choisissez au moins un type. Vous pouvez en sélectionner plusieurs. Vœu et Questions sont reportés dans la case « Autre » du formulaire officiel.</p>
+        <p class="hint" id="type-hint">Choisissez au moins un type. Vous pouvez en sélectionner plusieurs. Vœu et Question sont reportés dans la case « Autre » du formulaire officiel.</p>
         <div class="field other-field" id="other-field" hidden>
           <label for="other-type">Précisez le type « Autre » <span class="required" aria-hidden="true">*</span></label>
           <input id="other-type" name="otherType" type="text" maxlength="100" placeholder="Ex. question, interpellation…" autocomplete="off">
@@ -497,8 +467,14 @@
           <p class="upload-error" id="signature-error" role="alert"></p>
         </div>
 
-        <fieldset class="choice-group format-choices" aria-describedby="format-hint">
-          <legend class="field-label">Documents à télécharger</legend>
+        <div class="download-heading">
+          <h2 class="field-label" id="download-heading">Documents à télécharger</h2>
+          <button class="download" id="download" type="button" disabled>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Télécharger
+          </button>
+        </div>
+        <fieldset class="format-choices" aria-labelledby="download-heading" aria-describedby="format-hint">
           <div class="download-grid">
             <div class="download-card">
               <strong>Word (.docx)</strong>
@@ -521,9 +497,12 @@
         <div class="email-fields">
           <h2 class="email-heading">Préparation de l’e-mail</h2>
           <div class="field">
-            <label for="email-sender">Expéditeur (adresse e-mail)</label>
-            <input id="email-sender" type="email" maxlength="254" autocomplete="email" value="daniel@sage.li">
-            <p class="hint">Votre messagerie détermine le compte d’envoi ; cette adresse est reprise dans la signature du message.</p>
+            <label for="email-recipients">Destinataire(s) <span class="required" aria-hidden="true">*</span></label>
+            <div class="recipient-row">
+              <input id="email-recipients" type="text" maxlength="1000" required aria-describedby="email-recipients-hint" value="Silvana.DellaVecchia@ecublens.ch">
+              <button class="email-button" id="prepare-email" type="button" disabled>Prepare Email</button>
+            </div>
+            <p class="hint" id="email-recipients-hint">Séparez plusieurs adresses par une virgule ou un point-virgule.</p>
           </div>
           <div class="field">
             <label for="email-subject">Sujet de l’e-mail</label>
@@ -534,14 +513,7 @@
             <textarea id="email-message" rows="6"></textarea>
           </div>
         </div>
-        <div class="actions">
-          <button class="download" id="download" type="button" disabled>
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Télécharger
-          </button>
-          <button class="email-button" id="prepare-email" type="button" disabled>Prepare Email</button>
-        </div>
-        <p class="hint">Le partage des fichiers dépend de votre navigateur. Si les pièces jointes ne peuvent pas être transmises directement, les fichiers seront téléchargés pour être ajoutés au brouillon destiné à Silvana Della Vecchia.</p>
+        <p class="hint">Le partage des fichiers dépend de votre navigateur. Si les pièces jointes ne peuvent pas être transmises directement, les fichiers seront téléchargés pour être ajoutés au brouillon de votre messagerie.</p>
         <p class="status" id="status" role="status" aria-live="polite"></p>
         <p class="privacy">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 5.5 6v5.1c0 4.3 2.7 8.2 6.5 9.9 3.8-1.7 6.5-5.6 6.5-9.9V6L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -574,7 +546,7 @@
       const signatureName = document.getElementById("signature-name");
       const signatureError = document.getElementById("signature-error");
       const emailButton = document.getElementById("prepare-email");
-      const emailSenderInput = document.getElementById("email-sender");
+      const emailRecipientInput = document.getElementById("email-recipients");
       const emailSubjectInput = document.getElementById("email-subject");
       const emailMessageInput = document.getElementById("email-message");
       const otherField = document.getElementById("other-field");
@@ -720,7 +692,7 @@
         const valid = hasType && Boolean(text.trim()) && text.length <= 5000 &&
           formats.length > 0 && (!needsOther || Boolean(otherInput.value.trim()));
         downloadButton.disabled = !valid || busy;
-        emailButton.disabled = !valid || busy;
+        emailButton.disabled = !valid || busy || !emailRecipientInput.value.trim();
         return valid;
       }
 
@@ -743,10 +715,6 @@
         updateFormState();
       }
 
-      function updateOtherTypeError() {
-        otherInput.setAttribute("aria-invalid", String(typeInputs.some(input => input.checked && input.value === "Autre") && !otherInput.value.trim()));
-      }
-
       function readSignature() {
         if (!signatureFile) return Promise.resolve(null);
         return signatureFile.arrayBuffer().then(buffer => ({
@@ -764,12 +732,11 @@
         const otherLabel = otherInput.value.trim();
         const mappedOtherTypes = [];
         if (types.includes("Vœu")) mappedOtherTypes.push("Vœu");
-        if (types.includes("Questions")) mappedOtherTypes.push("Questions");
+        if (types.includes("Question")) mappedOtherTypes.push("Question");
         if (types.includes("Autre")) mappedOtherTypes.push(otherLabel);
         return {
           types,
           otherType: mappedOtherTypes.join(" / "),
-          date: dateInput.value,
           dateDisplay: dateInput.value
             ? new Intl.DateTimeFormat("fr-CH", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(`${dateInput.value}T12:00:00`))
             : "",
@@ -801,11 +768,21 @@
           year: "numeric"
         }).format(subjectDate);
         const subjectParts = [type, nameInput.value.trim(), formattedDate].filter(Boolean);
-        const signature = [nameInput.value.trim(), emailSenderInput.value.trim()].filter(Boolean).join("\n");
         if (!emailSubjectEdited) emailSubjectInput.value = subjectParts.join(" ");
         if (!emailMessageEdited) {
-          emailMessageInput.value = `Chère Madame,\n\nVeuillez trouver ci-joint mon intervention.\n\nCordialement,\n\n${signature}`;
+          emailMessageInput.value = `Chère Madame,\n\nVeuillez trouver ci-joint mon intervention.\n\nCordialement,\n\n${nameInput.value.trim()}`;
         }
+      }
+
+      function getEmailRecipients() {
+        const recipients = [...new Set(emailRecipientInput.value.split(/[,;]+/).map(address => address.trim()).filter(Boolean))];
+        if (!recipients.length) throw new Error("Indiquez au moins une adresse e-mail destinataire.");
+        const validator = document.createElement("input");
+        validator.type = "email";
+        validator.multiple = true;
+        validator.value = recipients.join(", ");
+        if (!validator.checkValidity()) throw new Error("Vérifiez les adresses e-mail destinataires.");
+        return recipients;
       }
 
       function downloadBlob(blob, name) {
@@ -922,7 +899,7 @@
         }
         const pdfForm = pdf.getForm();
         for (const type of data.types) {
-          if (type === "Vœu" || type === "Questions" || type === "Autre") pdfForm.getCheckBox("Autre").check();
+          if (type === "Vœu" || type === "Question" || type === "Autre") pdfForm.getCheckBox("Autre").check();
           else pdfForm.getCheckBox(type).check();
         }
         pdfForm.getTextField("Ecublens le").setText(data.dateDisplay);
@@ -1021,191 +998,6 @@
         return templateBackgroundPromise;
       }
 
-      async function createDocxLegacy(data, signature) {
-        if (!window.docx) throw new Error("La bibliothèque Word n’a pas pu être chargée. Vérifiez votre connexion, puis réessayez.");
-        const {
-          Document, Packer, Paragraph, TextRun, ImageRun, Header, Table, TableRow, TableCell,
-          WidthType, TableLayoutType, BorderStyle, HeightRule, LineRuleType, VerticalAlign,
-          AlignmentType, HorizontalPositionRelativeFrom, VerticalPositionRelativeFrom,
-          TextWrappingType, DocumentGridType
-        } = window.docx;
-        const backgroundBytes = await loadTemplateBackground();
-        const pageWidth = 595.32;
-        const pageHeight = 841.92;
-        const toTwips = value => Math.round(value * 20);
-        const toEmu = value => Math.round(value * 12700);
-        const toPixels = value => value * 96 / 72;
-        const imagePosition = (x, y, zIndex) => ({
-          horizontalPosition: { relative: HorizontalPositionRelativeFrom.PAGE, offset: toEmu(x) },
-          verticalPosition: { relative: VerticalPositionRelativeFrom.PAGE, offset: toEmu(y) },
-          allowOverlap: true,
-          behindDocument: false,
-          lockAnchor: true,
-          zIndex,
-          wrap: { type: TextWrappingType.NONE }
-        });
-        const backgroundImage = new ImageRun({
-          data: backgroundBytes,
-          type: "png",
-          transformation: { width: toPixels(pageWidth), height: toPixels(pageHeight) },
-          floating: imagePosition(0, 0, 0)
-        });
-        const positionedImages = [backgroundImage];
-        const signatureRect = { x: 317.381, y: 759.42, width: 224.017, height: 30 };
-        if (signature) {
-          const scale = Math.min(
-            toPixels(signatureRect.width) / signature.width,
-            toPixels(signatureRect.height) / signature.height
-          );
-          const width = signature.width * scale;
-          const height = signature.height * scale;
-          positionedImages.push(new ImageRun({
-            data: signature.bytes,
-            type: signature.type,
-            transformation: { width, height },
-            floating: imagePosition(
-              signatureRect.x,
-              signatureRect.y + (signatureRect.height - height * 0.75) / 2,
-              1
-            )
-          }));
-        }
-        const header = new Header({
-          children: [new Paragraph({
-            spacing: { before: 0, after: 0, line: 1, lineRule: LineRuleType.EXACT },
-            children: positionedImages
-          })]
-        });
-        const runOptions = run => ({
-          text: run.text,
-          font: "Arial",
-          size: data.fontSize * 2,
-          bold: run.bold,
-          italics: run.italic,
-          underline: run.underline ? { type: "single" } : undefined,
-          strike: run.strike
-        });
-        const fieldRun = (text, options = {}) => new TextRun({ text, font: "Arial", size: 18, ...options });
-        const exactParagraph = (children, line, options = {}) => new Paragraph({
-          spacing: { before: 0, after: 0, line: Math.max(1, toTwips(line)), lineRule: LineRuleType.EXACT },
-          children,
-          ...options
-        });
-        const richParagraphs = [[]];
-        for (const run of data.richRuns) {
-          const parts = run.text.split(/(\n)/);
-          for (const part of parts) {
-            if (part === "\n") richParagraphs.push([]);
-            else if (part) richParagraphs[richParagraphs.length - 1].push(new TextRun(runOptions({ ...run, text: part })));
-          }
-        }
-        const bodyLineHeight = data.fontSize === 10 ? 10.2 : data.fontSize * 1.15;
-        const bodyParagraphs = richParagraphs.map(runs => exactParagraph(
-          runs.length ? runs : [new TextRun({ text: " ", font: "Arial", size: data.fontSize * 2 })],
-          bodyLineHeight
-        ));
-        const noBorder = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
-        const makeRow = (height, children, options = {}) => new TableRow({
-          height: { value: toTwips(height), rule: HeightRule.EXACT },
-          children: [new TableCell({
-            children,
-            width: { size: toTwips(pageWidth), type: WidthType.DXA },
-            margins: { top: 0, bottom: 0, left: 0, right: 0, ...options.margins },
-            verticalAlign: options.verticalAlign || VerticalAlign.CENTER
-          })]
-        });
-        const blank = height => makeRow(height, [exactParagraph(
-          [new TextRun({ text: " ", font: "Arial", size: 2 })],
-          Math.min(height, 1)
-        )]);
-        const makeOverlayCell = (width, paragraph, height, verticalAlign = VerticalAlign.CENTER) => new TableCell({
-          children: [paragraph],
-          width: { size: toTwips(width), type: WidthType.DXA },
-          margins: { top: 0, bottom: 0, left: 0, right: 0 },
-          verticalAlign
-        });
-        const makeOverlayTable = (widths, cells, height) => new Table({
-          width: { size: toTwips(widths.reduce((sum, width) => sum + width, 0)), type: WidthType.DXA },
-          columnWidths: widths.map(toTwips),
-          layout: TableLayoutType.FIXED,
-          borders: { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder, insideHorizontal: noBorder, insideVertical: noBorder },
-          rows: [new TableRow({ height: { value: toTwips(height), rule: HeightRule.EXACT }, children: cells })]
-        });
-        const checkboxTypes = ["Postulat", "Motion", "Amendement"];
-        const checkboxWidths = [139.424, 113.278, 114, 228.618];
-        const checkboxCells = [
-          makeOverlayCell(checkboxWidths[0], exactParagraph([fieldRun("")], 14.173), 14.173)
-        ];
-        checkboxTypes.forEach((type, index) => {
-          checkboxCells.push(makeOverlayCell(
-            checkboxWidths[index + 1],
-            exactParagraph([fieldRun(data.types.includes(type) ? "X" : "", { size: 20 })], 14.173, {
-              indent: { left: toTwips(2.5) }
-            }),
-            14.173
-          ));
-        });
-        const checkboxTable = makeOverlayTable(checkboxWidths, checkboxCells, 14.173);
-        const otherCheckWidth = 97.775;
-        const otherWidths = [139.702, otherCheckWidth, pageWidth - 139.702 - otherCheckWidth];
-        const otherTable = makeOverlayTable(otherWidths, [
-          makeOverlayCell(otherWidths[0], exactParagraph([fieldRun("")], 18.997), 18.997),
-          makeOverlayCell(otherWidths[1], exactParagraph([
-            fieldRun(data.types.some(type => type === "Autre" || type === "Vœu") ? "X" : "", { size: 20 })
-          ], 18.997, { indent: { left: toTwips(2.5) } }), 18.997),
-          makeOverlayCell(otherWidths[2], exactParagraph([fieldRun(data.otherType)], 18.997), 18.997)
-        ], 18.997);
-        const dateParagraph = exactParagraph([fieldRun(data.dateDisplay)], 18.997, {
-          alignment: AlignmentType.LEFT,
-          indent: { left: toTwips(464.503) }
-        });
-        const nameParagraph = exactParagraph([fieldRun(data.name)], 17.107, {
-          indent: { left: toTwips(329.719) }
-        });
-        const formTable = new Table({
-          width: { size: toTwips(pageWidth), type: WidthType.DXA },
-          columnWidths: [toTwips(pageWidth)],
-          layout: TableLayoutType.FIXED,
-          borders: { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder, insideHorizontal: noBorder, insideVertical: noBorder },
-          rows: [
-            blank(91.883),
-            makeRow(18.997, [dateParagraph]),
-            blank(16.331),
-            makeRow(14.173, [checkboxTable]),
-            blank(8.887),
-            makeRow(18.997, [otherTable]),
-            blank(7.788),
-            makeRow(553.168, bodyParagraphs, {
-              margins: {
-                top: toTwips(5),
-                bottom: toTwips(3),
-                left: toTwips(54.855 + 5),
-                right: toTwips(pageWidth - (54.855 + 486.221 - 5))
-              },
-              verticalAlign: VerticalAlign.TOP
-            }),
-            blank(7.64),
-            makeRow(17.107, [nameParagraph]),
-            blank(1.987),
-            makeRow(17.107, [exactParagraph([fieldRun("")], 17.107)])
-          ]
-        });
-        const document = new Document({
-          sections: [{
-            properties: {
-              page: {
-                size: { width: toTwips(pageWidth), height: toTwips(pageHeight) },
-                margin: { top: 0, right: 0, bottom: 0, left: 0, header: 0, footer: 0 }
-              }
-            },
-            grid: { type: DocumentGridType.DEFAULT, linePitch: 1 },
-            headers: { default: header },
-            children: [formTable]
-          }]
-        });
-        return Packer.toBlob(document);
-      }
-
       async function createDocx(data, signature) {
         if (!window.docx) throw new Error("La bibliothèque Word n’a pas pu être chargée. Vérifiez votre connexion, puis réessayez.");
         if (!window.JSZip) throw new Error("La bibliothèque de documents n’a pas pu être chargée. Vérifiez votre connexion, puis réessayez.");
@@ -1288,7 +1080,7 @@
           const fill = fillColor ? `filled="t" fillcolor="${fillColor}"` : 'filled="f"';
           return `<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="1" w:lineRule="exact"/></w:pPr><w:r><w:pict><v:rect id="${name}" style="${style}" ${fill} stroked="f"><v:textbox inset="${inset}"><w:txbxContent>${paragraphs}</w:txbxContent></v:textbox><w10:wrap type="none"/></v:rect></w:pict></w:r></w:p>`;
         };
-        const fieldBox = (name, rect, text, size = 9, fillColor = null, bold = false) => text
+        const fieldBox = (name, rect, text, size = 11, fillColor = null, bold = false) => text
           ? textBox(name, rect, paragraphXml(runXml(text, { bold }, size), 12, "left"), "0,0,0,0", fillColor ? 2 : 1, fillColor)
           : "";
         const checkBox = (name, rect, checked) => checked
@@ -1327,7 +1119,7 @@
           fieldBox("DateField", dateRect, data.dateDisplay),
           ...typeLabelRects.map(([name, rect, text, size = 11]) => fieldBox(name, rect, text, size, "#FFFFFF", true)),
           ...checkboxRects.map(([type, rect]) => checkBox(`Checkbox-${type}`, rect, data.types.includes(type))),
-          checkBox("Checkbox-Autre", otherCheckboxRect, data.types.some(type => type === "Autre" || type === "Vœu" || type === "Questions")),
+          checkBox("Checkbox-Autre", otherCheckboxRect, data.types.some(type => type === "Autre" || type === "Vœu" || type === "Question")),
           fieldBox("OtherType", otherTextRect, data.otherType),
           fieldBox("NameLabel", nameLabelRect, "Prénom, nom :", 10.5, "#FFFFFF"),
           fieldBox("NameField", nameRect, data.name),
@@ -1371,79 +1163,6 @@
           const style = richStyleName(run);
           return style ? `<text:span text:style-name="${style}">${text}</text:span>` : text;
         }).join("") || " ";
-      }
-
-      async function createOdtLegacy(data, signature) {
-        if (!window.JSZip) throw new Error("La bibliothèque LibreOffice n’a pas pu être chargée. Vérifiez votre connexion, puis réessayez.");
-        const zip = new JSZip();
-        const logoBytes = await loadTemplateLogo();
-        const stylesForRuns = [...new Set(data.richRuns.map(richStyleName).filter(Boolean))].map(style => {
-          const props = style.slice(4);
-          const textProps = [
-            props.includes("Bold") ? 'fo:font-weight="bold"' : "",
-            props.includes("Italic") ? 'fo:font-style="italic"' : "",
-            props.includes("Underline") ? 'style:text-underline-style="solid"' : "",
-            props.includes("Strike") ? 'style:text-line-through-style="solid"' : ""
-          ].filter(Boolean).join(" ");
-          return `<style:style style:name="${style}" style:family="text"><style:text-properties ${textProps}/></style:style>`;
-        }).join("");
-        const other = xmlEscape(data.otherType);
-        const dateText = `Ecublens VD, le ${data.dateDisplay}`;
-        const bodyLineHeight = data.fontSize === 10 ? "10.2pt" : `${(data.fontSize * 1.15).toFixed(2)}pt`;
-        const checked = type => data.types.includes(type) ? "☒" : "☐";
-        const otherChecked = data.types.some(type => type === "Autre" || type === "Vœu" || type === "Questions") ? "☒" : "☐";
-        const signatureFrame = signature
-          ? `<draw:frame draw:name="Signature" text:anchor-type="as-char" svg:width="4.8cm" svg:height="1.1cm"><draw:image xlink:href="Pictures/signature.${signature.type}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/></draw:frame>`
-          : "";
-        const content = `<?xml version="1.0" encoding="UTF-8"?>
-<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" office:version="1.3">
-  <office:automatic-styles>
-    <style:style style:name="Meta" style:family="paragraph"><style:paragraph-properties fo:margin="0cm"/><style:text-properties fo:font-family="Arial" fo:font-size="9pt"/></style:style>
-    <style:style style:name="Date" style:family="paragraph"><style:paragraph-properties fo:text-align="end" fo:margin="0cm"/><style:text-properties fo:font-family="Arial" fo:font-size="9pt"/></style:style>
-    <style:style style:name="HeaderGap" style:family="paragraph"><style:paragraph-properties fo:line-height="0.2cm" fo:margin="0cm"/><style:text-properties fo:font-size="1pt"/></style:style>
-    <style:style style:name="Body" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="${bodyLineHeight}"/><style:text-properties fo:font-family="Arial" fo:font-size="${data.fontSize}pt"/></style:style>
-    <style:style style:name="FormLine" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="0.38cm"><style:tab-stops><style:tab-stop style:position="3.1cm" style:type="left"/><style:tab-stop style:position="7.1cm" style:type="left"/><style:tab-stop style:position="11.1cm" style:type="left"/></style:tab-stops></style:paragraph-properties><style:text-properties fo:font-family="Arial" fo:font-size="9pt"/></style:style>
-    <style:style style:name="OtherLine" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="0.38cm"><style:tab-stops><style:tab-stop style:position="3.1cm" style:type="left"/></style:tab-stops></style:paragraph-properties><style:text-properties fo:font-family="Arial" fo:font-size="9pt"/></style:style>
-    <style:style style:name="FooterLine" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="0.38cm"><style:tab-stops><style:tab-stop style:position="7.2cm" style:type="left"/></style:tab-stops></style:paragraph-properties><style:text-properties fo:font-family="Arial" fo:font-size="9pt"/></style:style>
-    <style:style style:name="FormTable" style:family="table"><style:table-properties style:width="17.32cm" table:align="margins"/></style:style>
-    <style:style style:name="HeaderTable" style:family="table"><style:table-properties style:width="17.32cm" table:align="margins"/></style:style>
-    <style:style style:name="HeaderColumn" style:family="table-column"><style:table-column-properties style:column-width="8.66cm"/></style:style>
-    <style:style style:name="FormColumn" style:family="table-column"><style:table-column-properties style:column-width="17.32cm"/></style:style>
-    <style:style style:name="HeaderCell" style:family="table-cell"><style:table-cell-properties fo:border="none" fo:padding="0cm" fo:vertical-align="middle"/></style:style>
-    <style:style style:name="FormCell" style:family="table-cell"><style:table-cell-properties fo:border="0.5pt solid #000000" fo:padding="0.08cm 0.16cm" fo:vertical-align="middle"/></style:style>
-    <style:style style:name="BodyCell" style:family="table-cell"><style:table-cell-properties fo:border="0.5pt solid #000000" fo:padding="0.12cm 0.16cm" fo:vertical-align="top"/></style:style>
-    <style:style style:name="TopRow" style:family="table-row"><style:table-row-properties style:row-height="0.85cm" style:use-optimal-row-height="false"/></style:style>
-    <style:style style:name="BodyRow" style:family="table-row"><style:table-row-properties style:row-height="19.6cm" style:use-optimal-row-height="false"/></style:style>
-    <style:style style:name="FooterRow" style:family="table-row"><style:table-row-properties style:row-height="2.2cm" style:use-optimal-row-height="false"/></style:style>
-    ${stylesForRuns}
-  </office:automatic-styles>
-  <office:body><office:text>
-    <table:table table:name="Header" table:style-name="HeaderTable">
-      <table:table-column table:style-name="HeaderColumn"/><table:table-column table:style-name="HeaderColumn"/>
-      <table:table-row><table:table-cell table:style-name="HeaderCell"><text:p text:style-name="Meta"><draw:frame draw:name="EcublensLogo" text:anchor-type="as-char" svg:width="5.82cm" svg:height="2.54cm"><draw:image xlink:href="Pictures/ecublens-logo.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/></draw:frame></text:p></table:table-cell><table:table-cell table:style-name="HeaderCell"><text:p text:style-name="Meta"/></table:table-cell></table:table-row>
-      <table:table-row><table:table-cell table:style-name="HeaderCell"><text:p text:style-name="Meta"/></table:table-cell><table:table-cell table:style-name="HeaderCell"><text:p text:style-name="Date">${xmlEscape(dateText)}</text:p></table:table-cell></table:table-row>
-    </table:table>
-    <text:p text:style-name="HeaderGap"><text:s/></text:p>
-    <table:table table:name="InterventionForm" table:style-name="FormTable">
-      <table:table-column table:style-name="FormColumn"/>
-      <table:table-row table:style-name="TopRow"><table:table-cell table:style-name="FormCell"><text:p text:style-name="FormLine"><text:span text:style-name="Bold">Type : </text:span><text:tab/>${checked("Postulat")} Postulat<text:tab/>${checked("Motion")} Motion<text:tab/>${checked("Amendement")} Amendement</text:p></table:table-cell></table:table-row>
-      <table:table-row table:style-name="TopRow"><table:table-cell table:style-name="FormCell"><text:p text:style-name="OtherLine"><text:tab/>${otherChecked} Autre (préciser) : ${other}</text:p></table:table-cell></table:table-row>
-      <table:table-row table:style-name="BodyRow"><table:table-cell table:style-name="BodyCell"><text:p text:style-name="Body">${odtRichText(data.richRuns)}</text:p></table:table-cell></table:table-row>
-      <table:table-row table:style-name="FooterRow"><table:table-cell table:style-name="FormCell"><text:p text:style-name="FooterLine"><text:tab/>Nom, prénom : ${xmlEscape(data.name)}</text:p><text:p text:style-name="FooterLine"><text:tab/>Signature : ${signatureFrame}</text:p></table:table-cell></table:table-row>
-    </table:table>
-  </office:text></office:body>
-</office:document-content>`;
-        const styles = `<?xml version="1.0" encoding="UTF-8"?>
-<office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" office:version="1.3"><office:styles/><office:automatic-styles><style:page-layout style:name="Page"><style:page-layout-properties fo:page-width="21cm" fo:page-height="29.7cm" style:print-orientation="portrait" fo:margin-top="1.1cm" fo:margin-bottom="1.5cm" fo:margin-left="1.84cm" fo:margin-right="1.84cm"/></style:page-layout></office:automatic-styles><office:master-styles><style:master-page style:name="Default" style:page-layout-name="Page"/></office:master-styles></office:document-styles>`;
-        const manifest = `<?xml version="1.0" encoding="UTF-8"?>
-<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.3"><manifest:file-entry manifest:full-path="/" manifest:media-type="application/vnd.oasis.opendocument.text"/><manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/><manifest:file-entry manifest:full-path="styles.xml" manifest:media-type="text/xml"/><manifest:file-entry manifest:full-path="Pictures/ecublens-logo.png" manifest:media-type="image/png"/>${signature ? `<manifest:file-entry manifest:full-path="Pictures/signature.${signature.type}" manifest:media-type="${signature.type === "png" ? "image/png" : "image/jpeg"}"/>` : ""}</manifest:manifest>`;
-        zip.file("mimetype", "application/vnd.oasis.opendocument.text", { compression: "STORE" });
-        zip.file("content.xml", content);
-        zip.file("styles.xml", styles);
-        zip.file("META-INF/manifest.xml", manifest);
-        zip.file("Pictures/ecublens-logo.png", logoBytes);
-        if (signature) zip.file(`Pictures/signature.${signature.type}`, signature.bytes);
-        return zip.generateAsync({ type: "blob", mimeType: "application/vnd.oasis.opendocument.text" });
       }
 
       async function createOdt(data, signature) {
@@ -1534,7 +1253,7 @@
 <office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" office:version="1.3">
   <office:automatic-styles>
     <style:style style:name="Anchor" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="0.01cm"/><style:text-properties fo:font-size="1pt"/></style:style>
-    <style:style style:name="FieldText" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="100%"/><style:text-properties fo:font-family="Arial" fo:font-size="9pt" fo:language="fr" fo:country="CH"/></style:style>
+    <style:style style:name="FieldText" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="100%"/><style:text-properties fo:font-family="Arial" fo:font-size="11pt" fo:language="fr" fo:country="CH"/></style:style>
     <style:style style:name="FormLabel" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="100%"/><style:text-properties fo:font-family="Arial" fo:font-size="11pt" fo:language="fr" fo:country="CH"/></style:style>
     <style:style style:name="FormLabelBold" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="100%"/><style:text-properties fo:font-family="Arial" fo:font-size="11pt" fo:font-weight="bold" fo:language="fr" fo:country="CH"/></style:style>
     <style:style style:name="FormLabelBoldSmall" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="100%"/><style:text-properties fo:font-family="Arial" fo:font-size="10pt" fo:font-weight="bold" fo:language="fr" fo:country="CH"/></style:style>
@@ -1548,7 +1267,7 @@
     <style:style style:name="SignatureFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="foreground" style:horizontal-pos="from-left" style:horizontal-rel="page" style:vertical-pos="from-top" style:vertical-rel="page" draw:fill="none" draw:stroke="none" fo:padding="0cm"/></style:style>
     ${runStyles}
   </office:automatic-styles>
-  <office:body><office:text><text:p text:style-name="Anchor">${backgroundFrame}${textFrame("CityLabel", cityLabelRect, "Ecublens VD, le", "FormLabel", { frameStyle: "FormLabelFrame", zIndex: 2 })}${textFrame("Date", dateRect, xmlEscape(data.dateDisplay), "FieldText", { zIndex: 2 })}${typeLabelRects.map(([name, rect, text, size = 11]) => textFrame(name, rect, xmlEscape(text), size === 10 ? "FormLabelBoldSmall" : "FormLabelBold", { frameStyle: "FormLabelFrame", zIndex: 2 })).join("")}${checkboxes}${checkboxFrame("Checkbox-Autre", otherCheckboxRect, data.types.some(type => type === "Autre" || type === "Vœu" || type === "Questions"))}${textFrame("AutreType", otherTextRect, xmlEscape(data.otherType), "FieldText", { zIndex: 2 })}${mainText}${textFrame("NameLabel", nameLabelRect, "Prénom, nom :", "FormLabel", { frameStyle: "FormLabelFrame", zIndex: 2 })}${textFrame("Nom", nameRect, xmlEscape(data.name), "FieldText", { zIndex: 2 })}${signatureImage}</text:p></office:text></office:body>
+  <office:body><office:text><text:p text:style-name="Anchor">${backgroundFrame}${textFrame("CityLabel", cityLabelRect, "Ecublens VD, le", "FormLabel", { frameStyle: "FormLabelFrame", zIndex: 2 })}${textFrame("Date", dateRect, xmlEscape(data.dateDisplay), "FieldText", { zIndex: 2 })}${typeLabelRects.map(([name, rect, text, size = 11]) => textFrame(name, rect, xmlEscape(text), size === 10 ? "FormLabelBoldSmall" : "FormLabelBold", { frameStyle: "FormLabelFrame", zIndex: 2 })).join("")}${checkboxes}${checkboxFrame("Checkbox-Autre", otherCheckboxRect, data.types.some(type => type === "Autre" || type === "Vœu" || type === "Question"))}${textFrame("AutreType", otherTextRect, xmlEscape(data.otherType), "FieldText", { zIndex: 2 })}${mainText}${textFrame("NameLabel", nameLabelRect, "Prénom, nom :", "FormLabel", { frameStyle: "FormLabelFrame", zIndex: 2 })}${textFrame("Nom", nameRect, xmlEscape(data.name), "FieldText", { zIndex: 2 })}${signatureImage}</text:p></office:text></office:body>
 </office:document-content>`;
         const styles = `<?xml version="1.0" encoding="UTF-8"?>
 <office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" office:version="1.3"><office:styles/><office:automatic-styles><style:page-layout style:name="Page"><style:page-layout-properties fo:page-width="21cm" fo:page-height="29.7cm" style:print-orientation="portrait" fo:margin-top="0cm" fo:margin-bottom="0cm" fo:margin-left="0cm" fo:margin-right="0cm"/></style:page-layout></office:automatic-styles><office:master-styles><style:master-page style:name="Default" style:page-layout-name="Page"/></office:master-styles></office:document-styles>`;
@@ -1565,7 +1284,6 @@
 
       async function generateOutputs(data, formats) {
         const signature = formats.some(format => format.endsWith(":with")) ? await readSignature() : null;
-        if (formats.some(format => !format.startsWith("pdf:"))) await createPdf(data, null);
         const outputs = [];
         for (const choice of formats) {
           const [format, signatureMode] = choice.split(":");
@@ -1609,6 +1327,7 @@
         updateFormState();
         setStatus("Préparation du message et des documents…");
         try {
+          const recipients = getEmailRecipients();
           const outputs = await generateOutputs(getFormData(), selectedFormats());
           const files = outputs.map(output => new File([output.blob], output.name, { type: output.blob.type }));
           if (navigator.share && navigator.canShare && navigator.canShare({ files })) {
@@ -1616,9 +1335,9 @@
               await navigator.share({
                 files,
                 title: emailSubjectInput.value,
-                text: `À : Silvana Della Vecchia <Silvana.DellaVecchia@ecublens.ch>\n\n${emailMessageInput.value}`
+                text: `À : ${recipients.join(", ")}\n\n${emailMessageInput.value}`
               });
-              setStatus("Les documents ont été transmis au menu de partage. Choisissez votre application de messagerie et vérifiez le destinataire.", "success");
+              setStatus("Les documents ont été transmis au menu de partage. Choisissez votre application de messagerie et vérifiez les destinataires.", "success");
               return;
             } catch (error) {
               if (error && error.name === "AbortError") {
@@ -1628,7 +1347,8 @@
             }
           }
           await downloadOutputs(outputs);
-          window.location.href = `mailto:Silvana.DellaVecchia@ecublens.ch?subject=${encodeURIComponent(emailSubjectInput.value)}&body=${encodeURIComponent(emailMessageInput.value)}`;
+          const mailtoRecipients = recipients.map(address => encodeURIComponent(address).replace(/%40/gi, "@")).join(",");
+          window.location.href = `mailto:${mailtoRecipients}?subject=${encodeURIComponent(emailSubjectInput.value)}&body=${encodeURIComponent(emailMessageInput.value)}`;
           setStatus("Les documents ont été téléchargés. Ajoutez-les au brouillon de votre messagerie.", "success");
         } catch (error) {
           setStatus(error instanceof Error ? error.message : "Le message n’a pas pu être préparé.", "error");
@@ -1639,14 +1359,12 @@
       }
 
       form.addEventListener("input", event => {
-        updateOtherTypeError();
         updateFormState();
-        if (!["email-subject", "email-message"].includes(event.target.id)) updateEmailDraft();
+        if (!["email-recipients", "email-subject", "email-message"].includes(event.target.id)) updateEmailDraft();
       });
       form.addEventListener("change", event => {
-        updateOtherTypeError();
         updateFormState();
-        if (!["email-subject", "email-message"].includes(event.target.id)) updateEmailDraft();
+        if (!["email-recipients", "email-subject", "email-message"].includes(event.target.id)) updateEmailDraft();
       });
 
       for (const button of formatTools) {
