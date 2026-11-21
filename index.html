@@ -142,7 +142,7 @@
 
     .types {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
       margin: 0;
       padding: 0;
@@ -379,7 +379,6 @@
 
     @media (max-width: 700px) {
       .types { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .type-option:last-child { grid-column: 1 / -1; }
       .upload { grid-template-columns: 1fr; }
       .upload-actions { justify-content: space-between; }
     }
@@ -428,8 +427,9 @@
           <label class="type-option"><input type="checkbox" name="type" value="Amendement">Amendement</label>
           <label class="type-option"><input type="checkbox" name="type" value="Vœu">Vœu</label>
           <label class="type-option"><input type="checkbox" name="type" value="Autre">Autre</label>
+          <label class="type-option"><input type="checkbox" name="type" value="Questions">Questions</label>
         </fieldset>
-        <p class="hint" id="type-hint">Choisissez au moins un type. Vous pouvez en sélectionner plusieurs.</p>
+        <p class="hint" id="type-hint">Choisissez au moins un type. Vous pouvez en sélectionner plusieurs. Vœu et Questions sont reportés dans la case « Autre » du formulaire officiel.</p>
         <div class="field other-field" id="other-field" hidden>
           <label for="other-type">Précisez le type « Autre » <span class="required" aria-hidden="true">*</span></label>
           <input id="other-type" name="otherType" type="text" maxlength="100" placeholder="Ex. question, interpellation…" autocomplete="off">
@@ -521,6 +521,11 @@
         <div class="email-fields">
           <h2 class="email-heading">Préparation de l’e-mail</h2>
           <div class="field">
+            <label for="email-sender">Expéditeur (adresse e-mail)</label>
+            <input id="email-sender" type="email" maxlength="254" autocomplete="email" value="daniel@sage.li">
+            <p class="hint">Votre messagerie détermine le compte d’envoi ; cette adresse est reprise dans la signature du message.</p>
+          </div>
+          <div class="field">
             <label for="email-subject">Sujet de l’e-mail</label>
             <input id="email-subject" type="text" maxlength="240">
           </div>
@@ -569,6 +574,7 @@
       const signatureName = document.getElementById("signature-name");
       const signatureError = document.getElementById("signature-error");
       const emailButton = document.getElementById("prepare-email");
+      const emailSenderInput = document.getElementById("email-sender");
       const emailSubjectInput = document.getElementById("email-subject");
       const emailMessageInput = document.getElementById("email-message");
       const otherField = document.getElementById("other-field");
@@ -758,6 +764,7 @@
         const otherLabel = otherInput.value.trim();
         const mappedOtherTypes = [];
         if (types.includes("Vœu")) mappedOtherTypes.push("Vœu");
+        if (types.includes("Questions")) mappedOtherTypes.push("Questions");
         if (types.includes("Autre")) mappedOtherTypes.push(otherLabel);
         return {
           types,
@@ -785,12 +792,19 @@
         const type = selectedTypes()
           .map(value => value === "Autre" ? otherInput.value.trim() || "Autre" : value)
           .join(", ");
-        const subjectParts = [type, nameInput.value.trim(), dateInput.value
-          ? new Intl.DateTimeFormat("fr-CH", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(`${dateInput.value}T12:00:00`))
-          : ""].filter(Boolean);
-        if (!emailSubjectEdited) emailSubjectInput.value = subjectParts.join(" — ");
+        const subjectDate = dateInput.value
+          ? new Date(`${dateInput.value}T12:00:00`)
+          : new Date();
+        const formattedDate = new Intl.DateTimeFormat("fr-CH", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric"
+        }).format(subjectDate);
+        const subjectParts = [type, nameInput.value.trim(), formattedDate].filter(Boolean);
+        const signature = [nameInput.value.trim(), emailSenderInput.value.trim()].filter(Boolean).join("\n");
+        if (!emailSubjectEdited) emailSubjectInput.value = subjectParts.join(" ");
         if (!emailMessageEdited) {
-          emailMessageInput.value = `Chère Madame,\n\nVeuillez trouver ci-joint mon intervention.\n\nCordialement,\n\n${nameInput.value.trim()}`;
+          emailMessageInput.value = `Chère Madame,\n\nVeuillez trouver ci-joint mon intervention.\n\nCordialement,\n\n${signature}`;
         }
       }
 
@@ -908,7 +922,7 @@
         }
         const pdfForm = pdf.getForm();
         for (const type of data.types) {
-          if (type === "Vœu" || type === "Autre") pdfForm.getCheckBox("Autre").check();
+          if (type === "Vœu" || type === "Questions" || type === "Autre") pdfForm.getCheckBox("Autre").check();
           else pdfForm.getCheckBox(type).check();
         }
         pdfForm.getTextField("Ecublens le").setText(data.dateDisplay);
@@ -1283,11 +1297,11 @@
         const dateRect = { x: 464.503, y: 91.883, width: 76.573, height: 18.997 };
         const cityLabelRect = { x: 380.5, y: 91.883, width: 83.3, height: 18.997 };
         const typeLabelRects = [
-          ["TypeLabel", { x: 56.64, y: 126.8, width: 29.5, height: 17.1 }, "Type :"],
-          ["PostulatLabel", { x: 155.18, y: 126.8, width: 39, height: 17.1 }, "Postulat"],
-          ["MotionLabel", { x: 268.61, y: 126.8, width: 35, height: 17.1 }, "Motion"],
-          ["AmendementLabel", { x: 382.03, y: 126.8, width: 64, height: 17.1 }, "Amendement"],
-          ["OtherLabel", { x: 155.18, y: 152.35, width: 79, height: 17.1 }, "Autre (préciser) :"]
+          ["TypeLabel", { x: 56.64, y: 126.8, width: 50, height: 17.1 }, "Type :"],
+          ["PostulatLabel", { x: 155.18, y: 126.8, width: 70, height: 17.1 }, "Postulat"],
+          ["MotionLabel", { x: 268.61, y: 126.8, width: 65, height: 17.1 }, "Motion"],
+          ["AmendementLabel", { x: 382.03, y: 126.8, width: 90, height: 17.1 }, "Amendement"],
+          ["OtherLabel", { x: 155.18, y: 152.35, width: 79, height: 17.1 }, "Autre (préciser) :", 10]
         ];
         const checkboxRects = [
           ["Postulat", { x: 139.424, y: 127.211, width: 15.307, height: 14.173 }],
@@ -1311,9 +1325,9 @@
         const shapes = [
           fieldBox("CityLabel", cityLabelRect, "Ecublens VD, le", 11, "#FFFFFF"),
           fieldBox("DateField", dateRect, data.dateDisplay),
-          ...typeLabelRects.map(([name, rect, text]) => fieldBox(name, rect, text, 11, "#FFFFFF", true)),
+          ...typeLabelRects.map(([name, rect, text, size = 11]) => fieldBox(name, rect, text, size, "#FFFFFF", true)),
           ...checkboxRects.map(([type, rect]) => checkBox(`Checkbox-${type}`, rect, data.types.includes(type))),
-          checkBox("Checkbox-Autre", otherCheckboxRect, data.types.some(type => type === "Autre" || type === "Vœu")),
+          checkBox("Checkbox-Autre", otherCheckboxRect, data.types.some(type => type === "Autre" || type === "Vœu" || type === "Questions")),
           fieldBox("OtherType", otherTextRect, data.otherType),
           fieldBox("NameLabel", nameLabelRect, "Prénom, nom :", 10.5, "#FFFFFF"),
           fieldBox("NameField", nameRect, data.name),
@@ -1377,7 +1391,7 @@
         const dateText = `Ecublens VD, le ${data.dateDisplay}`;
         const bodyLineHeight = data.fontSize === 10 ? "10.2pt" : `${(data.fontSize * 1.15).toFixed(2)}pt`;
         const checked = type => data.types.includes(type) ? "☒" : "☐";
-        const otherChecked = data.types.some(type => type === "Autre" || type === "Vœu") ? "☒" : "☐";
+        const otherChecked = data.types.some(type => type === "Autre" || type === "Vœu" || type === "Questions") ? "☒" : "☐";
         const signatureFrame = signature
           ? `<draw:frame draw:name="Signature" text:anchor-type="as-char" svg:width="4.8cm" svg:height="1.1cm"><draw:image xlink:href="Pictures/signature.${signature.type}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/></draw:frame>`
           : "";
@@ -1458,11 +1472,11 @@
         const dateRect = { x: 464.503, y: 91.883, width: 76.573, height: 18.997 };
         const cityLabelRect = { x: 380.5, y: 91.883, width: 83.3, height: 18.997 };
         const typeLabelRects = [
-          ["TypeLabel", { x: 56.64, y: 126.8, width: 29.5, height: 17.1 }, "Type :"],
-          ["PostulatLabel", { x: 155.18, y: 126.8, width: 39, height: 17.1 }, "Postulat"],
-          ["MotionLabel", { x: 268.61, y: 126.8, width: 35, height: 17.1 }, "Motion"],
-          ["AmendementLabel", { x: 382.03, y: 126.8, width: 64, height: 17.1 }, "Amendement"],
-          ["OtherLabel", { x: 155.18, y: 152.35, width: 79, height: 17.1 }, "Autre (préciser) :"]
+          ["TypeLabel", { x: 56.64, y: 126.8, width: 50, height: 17.1 }, "Type :"],
+          ["PostulatLabel", { x: 155.18, y: 126.8, width: 70, height: 17.1 }, "Postulat"],
+          ["MotionLabel", { x: 268.61, y: 126.8, width: 65, height: 17.1 }, "Motion"],
+          ["AmendementLabel", { x: 382.03, y: 126.8, width: 90, height: 17.1 }, "Amendement"],
+          ["OtherLabel", { x: 155.18, y: 152.35, width: 79, height: 17.1 }, "Autre (préciser) :", 10]
         ];
         const checkboxRects = [
           ["Postulat", { x: 139.424, y: 127.211, width: 15.307, height: 14.173 }],
@@ -1523,6 +1537,7 @@
     <style:style style:name="FieldText" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="100%"/><style:text-properties fo:font-family="Arial" fo:font-size="9pt" fo:language="fr" fo:country="CH"/></style:style>
     <style:style style:name="FormLabel" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="100%"/><style:text-properties fo:font-family="Arial" fo:font-size="11pt" fo:language="fr" fo:country="CH"/></style:style>
     <style:style style:name="FormLabelBold" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="100%"/><style:text-properties fo:font-family="Arial" fo:font-size="11pt" fo:font-weight="bold" fo:language="fr" fo:country="CH"/></style:style>
+    <style:style style:name="FormLabelBoldSmall" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="100%"/><style:text-properties fo:font-family="Arial" fo:font-size="10pt" fo:font-weight="bold" fo:language="fr" fo:country="CH"/></style:style>
     <style:style style:name="Check" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:text-align="center" fo:line-height="100%"/><style:text-properties fo:font-family="Arial" fo:font-size="10pt" fo:language="fr" fo:country="CH"/></style:style>
     <style:style style:name="Body" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="${bodyLineHeight}"/><style:text-properties fo:font-family="Arial" fo:font-size="${data.fontSize}pt" fo:language="fr" fo:country="CH"/></style:style>
     <style:style style:name="TemplateBackgroundFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="background" style:horizontal-pos="from-left" style:horizontal-rel="page" style:vertical-pos="from-top" style:vertical-rel="page" draw:fill="none" draw:stroke="none" fo:padding="0cm"/></style:style>
@@ -1533,7 +1548,7 @@
     <style:style style:name="SignatureFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="foreground" style:horizontal-pos="from-left" style:horizontal-rel="page" style:vertical-pos="from-top" style:vertical-rel="page" draw:fill="none" draw:stroke="none" fo:padding="0cm"/></style:style>
     ${runStyles}
   </office:automatic-styles>
-  <office:body><office:text><text:p text:style-name="Anchor">${backgroundFrame}${textFrame("CityLabel", cityLabelRect, "Ecublens VD, le", "FormLabel", { frameStyle: "FormLabelFrame", zIndex: 2 })}${textFrame("Date", dateRect, xmlEscape(data.dateDisplay), "FieldText", { zIndex: 2 })}${typeLabelRects.map(([name, rect, text]) => textFrame(name, rect, xmlEscape(text), "FormLabelBold", { frameStyle: "FormLabelFrame", zIndex: 2 })).join("")}${checkboxes}${checkboxFrame("Checkbox-Autre", otherCheckboxRect, data.types.some(type => type === "Autre" || type === "Vœu"))}${textFrame("AutreType", otherTextRect, xmlEscape(data.otherType), "FieldText", { zIndex: 2 })}${mainText}${textFrame("NameLabel", nameLabelRect, "Prénom, nom :", "FormLabel", { frameStyle: "FormLabelFrame", zIndex: 2 })}${textFrame("Nom", nameRect, xmlEscape(data.name), "FieldText", { zIndex: 2 })}${signatureImage}</text:p></office:text></office:body>
+  <office:body><office:text><text:p text:style-name="Anchor">${backgroundFrame}${textFrame("CityLabel", cityLabelRect, "Ecublens VD, le", "FormLabel", { frameStyle: "FormLabelFrame", zIndex: 2 })}${textFrame("Date", dateRect, xmlEscape(data.dateDisplay), "FieldText", { zIndex: 2 })}${typeLabelRects.map(([name, rect, text, size = 11]) => textFrame(name, rect, xmlEscape(text), size === 10 ? "FormLabelBoldSmall" : "FormLabelBold", { frameStyle: "FormLabelFrame", zIndex: 2 })).join("")}${checkboxes}${checkboxFrame("Checkbox-Autre", otherCheckboxRect, data.types.some(type => type === "Autre" || type === "Vœu" || type === "Questions"))}${textFrame("AutreType", otherTextRect, xmlEscape(data.otherType), "FieldText", { zIndex: 2 })}${mainText}${textFrame("NameLabel", nameLabelRect, "Prénom, nom :", "FormLabel", { frameStyle: "FormLabelFrame", zIndex: 2 })}${textFrame("Nom", nameRect, xmlEscape(data.name), "FieldText", { zIndex: 2 })}${signatureImage}</text:p></office:text></office:body>
 </office:document-content>`;
         const styles = `<?xml version="1.0" encoding="UTF-8"?>
 <office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" office:version="1.3"><office:styles/><office:automatic-styles><style:page-layout style:name="Page"><style:page-layout-properties fo:page-width="21cm" fo:page-height="29.7cm" style:print-orientation="portrait" fo:margin-top="0cm" fo:margin-bottom="0cm" fo:margin-left="0cm" fo:margin-right="0cm"/></style:page-layout></office:automatic-styles><office:master-styles><style:master-page style:name="Default" style:page-layout-name="Page"/></office:master-styles></office:document-styles>`;
