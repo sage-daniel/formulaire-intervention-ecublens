@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#2651d4">
-  <meta name="description" content="Outil non officiel de préparation des interventions du Conseil communal d’Ecublens.">
-  <title>Préparer une intervention — outil non officiel d’Ecublens</title>
+  <meta name="description" content="Alternative simple et directe pour préparer une intervention sur le formulaire officiel du Conseil communal d’Ecublens.">
+  <title>Conseil communal Ecublens — Alternative pour un formulaire officiel d’intervention</title>
   <style>
     :root {
       color-scheme: light;
@@ -134,6 +134,7 @@
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 20px;
     }
+    .filename-field { margin-top: 16px; }
     .field { min-width: 0; }
     .field label, .field-label {
       display: block;
@@ -407,7 +408,7 @@
   <header class="masthead">
     <div class="masthead-inner">
       <div class="brand">
-        <p class="brand-kicker">OUTIL NON OFFICIEL · PRÉPARATION D’UNE INTERVENTION</p>
+        <p class="brand-kicker">CONSEIL COMMUNAL ECUBLENS</p>
         <div class="brand-meta">
           <p>Daniel Sage (<a href="mailto:daniel@sage.li">daniel@sage.li</a>)</p>
           <p>Date : 20 Novembre 2026</p>
@@ -418,16 +419,16 @@
 
   <main>
     <section class="intro" aria-labelledby="page-title">
-      <p class="eyebrow">Outil non officiel · Conseil communal d’Ecublens</p>
-      <h1 id="page-title">Préparer une intervention</h1>
-      <p class="intro-note">Le formulaire officiel, lui, ne se remplit toujours pas tout seul.</p>
+      <p class="eyebrow">Conseil communal Ecublens</p>
+      <h1 id="page-title">Alternative pour un formulaire officiel d’intervention</h1>
+      <p class="intro-note">La paperasse par-dessus bord : préparez votre intervention simplement, sans détour.</p>
     </section>
 
     <aside class="notice" role="note" aria-label="Avertissement">
       <span class="notice-icon" aria-hidden="true">!</span>
       <div>
-        <strong>Outil non officiel, réservé aux Conseillères et Conseillers communaux d’Ecublens</strong>
-        <p>Il sert uniquement à préparer une intervention sur le formulaire officiel. Le document téléchargé reprend le modèle officiel.</p>
+        <strong>Réservé aux Conseillères et Conseillers communaux d’Ecublens</strong>
+        <p>Une autre façon de préparer votre intervention. Le document téléchargé reprend le formulaire officiel.</p>
       </div>
     </aside>
 
@@ -458,6 +459,11 @@
             <label for="name">Nom et prénom <span class="hint">(facultatif)</span></label>
             <input id="name" name="name" type="text" maxlength="120" autocomplete="name" placeholder="Votre nom complet">
           </div>
+        </div>
+        <div class="field filename-field">
+          <label for="filename">Nom du fichier (facultatif, sans extension)</label>
+          <input id="filename" name="filename" type="text" maxlength="100" autocomplete="off" aria-describedby="filename-hint">
+          <p class="hint" id="filename-hint">Proposition : <span id="filename-proposal"></span>. Si le champ reste vide, cette proposition sera utilisée. Le suffixe de signature et le format seront ajoutés.</p>
         </div>
 
         <div class="divider"></div>
@@ -497,7 +503,7 @@
               <img class="signature-preview" id="signature-preview" alt="Aperçu de la signature">
               <div>
                 <input class="file-input" id="signature" type="file" accept="image/png,image/jpeg" aria-describedby="signature-error">
-                <label class="file-button" for="signature">Téléverser une signature</label>
+                <label class="file-button" for="signature">Upload signature</label>
               </div>
               <button class="remove-signature" id="remove-signature" type="button">Retirer</button>
             </div>
@@ -544,7 +550,7 @@
   </main>
 
   <footer>
-    <div class="footer-inner">Outil non officiel pour la préparation des interventions du Conseil communal d’Ecublens</div>
+    <div class="footer-inner">Alternative de préparation des interventions du Conseil communal Ecublens</div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
@@ -557,6 +563,8 @@
       const form = document.getElementById("intervention-form");
       const dateInput = document.getElementById("date");
       const nameInput = document.getElementById("name");
+      const filenameInput = document.getElementById("filename");
+      const filenameProposal = document.getElementById("filename-proposal");
       const richEditor = document.getElementById("text");
       const otherInput = document.getElementById("other-type");
       const signatureInput = document.getElementById("signature");
@@ -577,10 +585,30 @@
       let signatureUrl = null;
       let signatureDimensions = null;
       let busy = false;
-      let templateLogoPromise = null;
+      let templateBackgroundPromise = null;
 
       function selectedTypes() {
         return typeInputs.filter(input => input.checked).map(input => input.value);
+      }
+
+      function slugifyFilename(value) {
+        return value.normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-|-$/g, "");
+      }
+
+      function proposedFilename() {
+        const type = selectedTypes()
+          .map(value => value === "Autre" ? otherInput.value.trim() || "autre" : value)
+          .map(slugifyFilename)
+          .filter(Boolean)
+          .join("-") || "intervention";
+        const name = slugifyFilename(nameInput.value.trim()) || "nom";
+        const now = new Date();
+        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+        return `${type}-${name}-${dateInput.value || today}`;
       }
 
       function selectedFormats() {
@@ -665,6 +693,9 @@
         const runs = readRichText();
         const text = runs.map(run => run.text).join("");
         const formats = selectedFormats();
+        const filenameExample = proposedFilename();
+        filenameInput.placeholder = filenameExample;
+        filenameProposal.textContent = filenameExample;
         otherField.hidden = !needsOther;
         otherInput.required = needsOther;
         otherInput.setAttribute("aria-invalid", String(needsOther && !otherInput.value.trim()));
@@ -735,6 +766,8 @@
             ? new Intl.DateTimeFormat("fr-CH", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(`${dateInput.value}T12:00:00`))
             : "",
           name: nameInput.value.trim(),
+          filenameBase: filenameInput.value.trim(),
+          filenameProposal: proposedFilename(),
           richRuns,
           text,
           fontSize: selectedFontSize(),
@@ -742,9 +775,9 @@
       }
 
       function filename(data, extension, withSignature) {
-        const person = data.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase();
+        const base = slugifyFilename(data.filenameBase) || data.filenameProposal;
         const signature = withSignature ? "avec-signature" : "sans-signature";
-        return `intervention-${person || "ecublens"}-${signature}.${extension}`;
+        return `${base}-${signature}.${extension}`;
       }
 
       function updateEmailLink() {
@@ -906,23 +939,74 @@
         return new Blob([await pdf.save()], { type: "application/pdf" });
       }
 
-      function loadTemplateLogo() {
-        if (!templateLogoPromise) {
-          templateLogoPromise = fetch("./ecublens-logo.png").then(response => {
-            if (!response.ok) throw new Error("Le logo du formulaire officiel est introuvable. Vérifiez que ecublens-logo.png est publié à côté de index.html.");
+      function loadTemplateBackground() {
+        if (!templateBackgroundPromise) {
+          templateBackgroundPromise = fetch("./template-formulaire.png").then(response => {
+            if (!response.ok) throw new Error("L’image du formulaire officiel est introuvable. Vérifiez que template-formulaire.png est publié à côté de index.html.");
             return response.arrayBuffer();
           }).then(buffer => new Uint8Array(buffer)).catch(error => {
-            templateLogoPromise = null;
+            templateBackgroundPromise = null;
             throw error;
           });
         }
-        return templateLogoPromise;
+        return templateBackgroundPromise;
       }
 
-      async function createDocx(data, signature) {
+      async function createDocxLegacy(data, signature) {
         if (!window.docx) throw new Error("La bibliothèque Word n’a pas pu être chargée. Vérifiez votre connexion, puis réessayez.");
-        const { Document, Packer, Paragraph, TextRun, ImageRun, Table, TableRow, TableCell, WidthType, TableLayoutType, BorderStyle, HeightRule, LineRuleType, VerticalAlign, AlignmentType, TabStopType } = window.docx;
-        const logoBytes = await loadTemplateLogo();
+        const {
+          Document, Packer, Paragraph, TextRun, ImageRun, Header, Table, TableRow, TableCell,
+          WidthType, TableLayoutType, BorderStyle, HeightRule, LineRuleType, VerticalAlign,
+          AlignmentType, HorizontalPositionRelativeFrom, VerticalPositionRelativeFrom,
+          TextWrappingType, DocumentGridType
+        } = window.docx;
+        const backgroundBytes = await loadTemplateBackground();
+        const pageWidth = 595.32;
+        const pageHeight = 841.92;
+        const toTwips = value => Math.round(value * 20);
+        const toEmu = value => Math.round(value * 12700);
+        const toPixels = value => value * 96 / 72;
+        const imagePosition = (x, y, zIndex) => ({
+          horizontalPosition: { relative: HorizontalPositionRelativeFrom.PAGE, offset: toEmu(x) },
+          verticalPosition: { relative: VerticalPositionRelativeFrom.PAGE, offset: toEmu(y) },
+          allowOverlap: true,
+          behindDocument: false,
+          lockAnchor: true,
+          zIndex,
+          wrap: { type: TextWrappingType.NONE }
+        });
+        const backgroundImage = new ImageRun({
+          data: backgroundBytes,
+          type: "png",
+          transformation: { width: toPixels(pageWidth), height: toPixels(pageHeight) },
+          floating: imagePosition(0, 0, 0)
+        });
+        const positionedImages = [backgroundImage];
+        const signatureRect = { x: 317.381, y: 756.959, width: 224.017, height: 17.107 };
+        if (signature) {
+          const scale = Math.min(
+            toPixels(signatureRect.width) / signature.width,
+            toPixels(signatureRect.height) / signature.height
+          );
+          const width = signature.width * scale;
+          const height = signature.height * scale;
+          positionedImages.push(new ImageRun({
+            data: signature.bytes,
+            type: signature.type,
+            transformation: { width, height },
+            floating: imagePosition(
+              signatureRect.x,
+              signatureRect.y + (signatureRect.height - height * 0.75) / 2,
+              1
+            )
+          }));
+        }
+        const header = new Header({
+          children: [new Paragraph({
+            spacing: { before: 0, after: 0, line: 1, lineRule: LineRuleType.EXACT },
+            children: positionedImages
+          })]
+        });
         const runOptions = run => ({
           text: run.text,
           font: "Arial",
@@ -932,114 +1016,255 @@
           underline: run.underline ? { type: "single" } : undefined,
           strike: run.strike
         });
-        const smallRun = (text, options = {}) => new TextRun({ text, font: "Arial", size: 18, ...options });
-        const textTabs = [
-          { type: TabStopType.LEFT, position: 1760 },
-          { type: TabStopType.LEFT, position: 4030 },
-          { type: TabStopType.LEFT, position: 6300 }
-        ];
-        const footerTabs = [{ type: TabStopType.LEFT, position: 4100 }];
-        const paragraphs = [[]];
+        const fieldRun = (text, options = {}) => new TextRun({ text, font: "Arial", size: 18, ...options });
+        const exactParagraph = (children, line, options = {}) => new Paragraph({
+          spacing: { before: 0, after: 0, line: Math.max(1, toTwips(line)), lineRule: LineRuleType.EXACT },
+          children,
+          ...options
+        });
+        const richParagraphs = [[]];
         for (const run of data.richRuns) {
           const parts = run.text.split(/(\n)/);
           for (const part of parts) {
-            if (part === "\n") paragraphs.push([]);
-            else if (part) paragraphs[paragraphs.length - 1].push(new TextRun(runOptions({ ...run, text: part })));
+            if (part === "\n") richParagraphs.push([]);
+            else if (part) richParagraphs[richParagraphs.length - 1].push(new TextRun(runOptions({ ...run, text: part })));
           }
         }
-        const bodyParagraphs = paragraphs.map(runs => new Paragraph({
-          spacing: {
-            before: 0,
-            after: 0,
-            line: Math.round((data.fontSize === 10 ? 10.2 : data.fontSize * 1.15) * 20),
-            lineRule: LineRuleType.EXACT
-          },
-          children: runs.length ? runs : [new TextRun({ text: " ", font: "Arial", size: data.fontSize * 2 })]
-        }));
-        const signatureRuns = [smallRun("\tSignature : ")];
-        if (signature) {
-          const scale = Math.min(180 / signature.width, 42 / signature.height);
-          signatureRuns.push(new ImageRun({
-            data: signature.bytes,
-            type: signature.type,
-            transformation: { width: signature.width * scale, height: signature.height * scale }
-          }));
-        }
-        const border = { style: BorderStyle.SINGLE, size: 4, color: "000000" };
-        const makeRow = (children, height) => new TableRow({
-          height: { value: height, rule: HeightRule.EXACT },
+        const bodyLineHeight = data.fontSize === 10 ? 10.2 : data.fontSize * 1.15;
+        const bodyParagraphs = richParagraphs.map(runs => exactParagraph(
+          runs.length ? runs : [new TextRun({ text: " ", font: "Arial", size: data.fontSize * 2 })],
+          bodyLineHeight
+        ));
+        const noBorder = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
+        const makeRow = (height, children, options = {}) => new TableRow({
+          height: { value: toTwips(height), rule: HeightRule.EXACT },
           children: [new TableCell({
             children,
-            width: { size: 9826, type: WidthType.DXA },
-            margins: { top: 35, bottom: 35, left: 80, right: 80 },
-            verticalAlign: VerticalAlign.TOP
+            width: { size: toTwips(pageWidth), type: WidthType.DXA },
+            margins: { top: 0, bottom: 0, left: 0, right: 0, ...options.margins },
+            verticalAlign: options.verticalAlign || VerticalAlign.CENTER
           })]
         });
-        const formTable = new Table({
-          width: { size: 9826, type: WidthType.DXA },
-          columnWidths: [9826],
+        const blank = height => makeRow(height, [exactParagraph(
+          [new TextRun({ text: " ", font: "Arial", size: 2 })],
+          Math.min(height, 1)
+        )]);
+        const makeOverlayCell = (width, paragraph, height, verticalAlign = VerticalAlign.CENTER) => new TableCell({
+          children: [paragraph],
+          width: { size: toTwips(width), type: WidthType.DXA },
+          margins: { top: 0, bottom: 0, left: 0, right: 0 },
+          verticalAlign
+        });
+        const makeOverlayTable = (widths, cells, height) => new Table({
+          width: { size: toTwips(widths.reduce((sum, width) => sum + width, 0)), type: WidthType.DXA },
+          columnWidths: widths.map(toTwips),
           layout: TableLayoutType.FIXED,
-          borders: { top: border, bottom: border, left: border, right: border, insideHorizontal: border, insideVertical: border },
+          borders: { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder, insideHorizontal: noBorder, insideVertical: noBorder },
+          rows: [new TableRow({ height: { value: toTwips(height), rule: HeightRule.EXACT }, children: cells })]
+        });
+        const checkboxTypes = ["Postulat", "Motion", "Amendement"];
+        const checkboxWidths = [139.424, 113.278, 114, 228.618];
+        const checkboxCells = [
+          makeOverlayCell(checkboxWidths[0], exactParagraph([fieldRun("")], 14.173), 14.173)
+        ];
+        checkboxTypes.forEach((type, index) => {
+          checkboxCells.push(makeOverlayCell(
+            checkboxWidths[index + 1],
+            exactParagraph([fieldRun(data.types.includes(type) ? "X" : "", { size: 20 })], 14.173, {
+              indent: { left: toTwips(2.5) }
+            }),
+            14.173
+          ));
+        });
+        const checkboxTable = makeOverlayTable(checkboxWidths, checkboxCells, 14.173);
+        const otherCheckWidth = 97.775;
+        const otherWidths = [139.702, otherCheckWidth, pageWidth - 139.702 - otherCheckWidth];
+        const otherTable = makeOverlayTable(otherWidths, [
+          makeOverlayCell(otherWidths[0], exactParagraph([fieldRun("")], 18.997), 18.997),
+          makeOverlayCell(otherWidths[1], exactParagraph([
+            fieldRun(data.types.some(type => type === "Autre" || type === "Vœu") ? "X" : "", { size: 20 })
+          ], 18.997, { indent: { left: toTwips(2.5) } }), 18.997),
+          makeOverlayCell(otherWidths[2], exactParagraph([fieldRun(data.otherType)], 18.997), 18.997)
+        ], 18.997);
+        const dateParagraph = exactParagraph([fieldRun(data.dateDisplay)], 18.997, {
+          alignment: AlignmentType.LEFT,
+          indent: { left: toTwips(464.503) }
+        });
+        const nameParagraph = exactParagraph([fieldRun(data.name)], 17.107, {
+          indent: { left: toTwips(329.719) }
+        });
+        const formTable = new Table({
+          width: { size: toTwips(pageWidth), type: WidthType.DXA },
+          columnWidths: [toTwips(pageWidth)],
+          layout: TableLayoutType.FIXED,
+          borders: { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder, insideHorizontal: noBorder, insideVertical: noBorder },
           rows: [
-            makeRow([new Paragraph({
-              spacing: { before: 0, after: 0, line: 220 },
-              tabStops: textTabs,
-              children: [
-                smallRun("Type : ", { bold: true }),
-                smallRun("\t"),
-                ...["Postulat", "Motion", "Amendement"].flatMap((type, index) => [
-                  smallRun(`${data.types.includes(type) ? "☒" : "☐"} ${type}`),
-                  ...(index < 2 ? [smallRun("\t")] : [])
-                ])
-              ]
-            })], 480),
-            makeRow([new Paragraph({
-              spacing: { before: 0, after: 0, line: 220 },
-              tabStops: [{ type: TabStopType.LEFT, position: 1760 }],
-              children: [
-                smallRun("\t"),
-                smallRun(`${data.types.some(type => type === "Autre" || type === "Vœu") ? "☒" : "☐"} Autre (préciser) : `),
-                smallRun(data.otherType)
-              ]
-            })], 480),
-            makeRow(bodyParagraphs, 11100),
-            makeRow([
-              new Paragraph({
-                spacing: { before: 0, after: 60, line: 220 },
-                tabStops: footerTabs,
-                children: [smallRun("\tNom, prénom : "), smallRun(data.name)]
-              }),
-              new Paragraph({
-                spacing: { before: 0, after: 0, line: 220 },
-                tabStops: footerTabs,
-                children: signatureRuns
-              })
-            ], 1250)
+            blank(91.883),
+            makeRow(18.997, [dateParagraph]),
+            blank(16.331),
+            makeRow(14.173, [checkboxTable]),
+            blank(8.887),
+            makeRow(18.997, [otherTable]),
+            blank(7.788),
+            makeRow(553.168, bodyParagraphs, {
+              margins: {
+                top: toTwips(5),
+                bottom: toTwips(3),
+                left: toTwips(54.855 + 5),
+                right: toTwips(pageWidth - (54.855 + 486.221 - 5))
+              },
+              verticalAlign: VerticalAlign.TOP
+            }),
+            blank(7.64),
+            makeRow(17.107, [nameParagraph]),
+            blank(1.987),
+            makeRow(17.107, [exactParagraph([fieldRun("")], 17.107)])
           ]
         });
-        const children = [
-          new Paragraph({
-            spacing: { before: 0, after: 0, line: 1440 },
-            children: [new ImageRun({
-              data: logoBytes,
-              type: "png",
-              transformation: { width: 220, height: 96 }
-            })]
-          }),
-          new Paragraph({
-            alignment: AlignmentType.RIGHT,
-            spacing: { before: 0, after: 180, line: 220 },
-            children: [smallRun(`Ecublens VD, le ${data.dateDisplay}`)]
-          }),
-          formTable
-        ];
         const document = new Document({
           sections: [{
-            properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 660, right: 1040, bottom: 850, left: 1040 } } },
-            children
+            properties: {
+              page: {
+                size: { width: toTwips(pageWidth), height: toTwips(pageHeight) },
+                margin: { top: 0, right: 0, bottom: 0, left: 0, header: 0, footer: 0 }
+              }
+            },
+            grid: { type: DocumentGridType.DEFAULT, linePitch: 1 },
+            headers: { default: header },
+            children: [formTable]
           }]
         });
         return Packer.toBlob(document);
+      }
+
+      async function createDocx(data, signature) {
+        if (!window.docx) throw new Error("La bibliothèque Word n’a pas pu être chargée. Vérifiez votre connexion, puis réessayez.");
+        if (!window.JSZip) throw new Error("La bibliothèque de documents n’a pas pu être chargée. Vérifiez votre connexion, puis réessayez.");
+        const {
+          Document, Packer, Paragraph, ImageRun, LineRuleType,
+          HorizontalPositionRelativeFrom, VerticalPositionRelativeFrom, TextWrappingType,
+          DocumentGridType
+        } = window.docx;
+        const backgroundBytes = await loadTemplateBackground();
+        const pageWidth = 595.32;
+        const pageHeight = 841.92;
+        const toPixels = value => value * 96 / 72;
+        const toEmu = value => Math.round(value * 12700);
+        const positionImage = (x, y, zIndex) => ({
+          horizontalPosition: { relative: HorizontalPositionRelativeFrom.PAGE, offset: toEmu(x) },
+          verticalPosition: { relative: VerticalPositionRelativeFrom.PAGE, offset: toEmu(y) },
+          allowOverlap: true,
+          behindDocument: true,
+          lockAnchor: true,
+          zIndex,
+          wrap: { type: TextWrappingType.NONE }
+        });
+        const positionedImages = [new ImageRun({
+          data: backgroundBytes,
+          type: "png",
+          transformation: { width: toPixels(pageWidth), height: toPixels(pageHeight) },
+          floating: positionImage(0, 0, 0)
+        })];
+        const signatureRect = { x: 317.381, y: 756.959, width: 224.017, height: 17.107 };
+        if (signature) {
+          const scale = Math.min(
+            toPixels(signatureRect.width) / signature.width,
+            toPixels(signatureRect.height) / signature.height
+          );
+          const width = signature.width * scale;
+          const height = signature.height * scale;
+          positionedImages.push(new ImageRun({
+            data: signature.bytes,
+            type: signature.type,
+            transformation: { width, height },
+            floating: positionImage(signatureRect.x, signatureRect.y + (signatureRect.height - height * 0.75) / 2, 1)
+          }));
+        }
+        const document = new Document({
+          sections: [{
+            properties: {
+              page: {
+                size: { width: Math.round(pageWidth * 20), height: Math.round(pageHeight * 20) },
+                margin: { top: 0, right: 0, bottom: 0, left: 0, header: 0, footer: 0 }
+              }
+            },
+            grid: { type: DocumentGridType.DEFAULT, linePitch: 1 },
+            children: [new Paragraph({
+              spacing: { before: 0, after: 0, line: 1, lineRule: LineRuleType.EXACT },
+              children: positionedImages
+            })]
+          }]
+        });
+        const packed = await Packer.toBlob(document);
+        const packageZip = await JSZip.loadAsync(packed);
+        let documentXml = await packageZip.file("word/document.xml").async("string");
+        const runXml = (text, style = {}, size = data.fontSize) => {
+          const runProperties = [
+            '<w:rFonts w:ascii="Arial" w:hAnsi="Arial"/>',
+            `<w:sz w:val="${Math.round(size * 2)}"/>`,
+            style.bold ? "<w:b/>" : "",
+            style.italic ? "<w:i/>" : "",
+            style.underline ? '<w:u w:val="single"/>' : "",
+            style.strike ? "<w:strike/>" : ""
+          ].join("");
+          return `<w:r><w:rPr>${runProperties}</w:rPr><w:t xml:space="preserve">${xmlEscape(text)}</w:t></w:r>`;
+        };
+        const paragraphXml = (runs, lineHeight, alignment) => {
+          const properties = `<w:pPr><w:spacing w:before="0" w:after="0" w:line="${Math.round(lineHeight * 20)}" w:lineRule="exact"/>${alignment ? `<w:jc w:val="${alignment}"/>` : ""}</w:pPr>`;
+          return `<w:p>${properties}${runs || runXml(" ", {}, data.fontSize)}</w:p>`;
+        };
+        const textBox = (name, rect, paragraphs, inset = "0,0,0,0", zIndex = 1) => {
+          const style = `position:absolute;margin-left:${rect.x}pt;margin-top:${rect.y}pt;width:${rect.width}pt;height:${rect.height}pt;mso-position-horizontal:absolute;mso-position-horizontal-relative:page;mso-position-vertical:absolute;mso-position-vertical-relative:page;z-index:${zIndex};`;
+          return `<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="1" w:lineRule="exact"/></w:pPr><w:r><w:pict><v:rect id="${name}" style="${style}" filled="f" stroked="f"><v:textbox inset="${inset}"><w:txbxContent>${paragraphs}</w:txbxContent></v:textbox><w10:wrap type="none"/></v:rect></w:pict></w:r></w:p>`;
+        };
+        const fieldBox = (name, rect, text) => text
+          ? textBox(name, rect, paragraphXml(runXml(text, {}, 9), 12, "left"))
+          : "";
+        const checkBox = (name, rect, checked) => checked
+          ? textBox(name, rect, paragraphXml(runXml("X", {}, 10), rect.height, "center"))
+          : "";
+        const dateRect = { x: 464.503, y: 91.883, width: 76.573, height: 18.997 };
+        const checkboxRects = [
+          ["Postulat", { x: 139.424, y: 127.211, width: 15.307, height: 14.173 }],
+          ["Motion", { x: 252.702, y: 127.211, width: 15.307, height: 14.173 }],
+          ["Amendement", { x: 366.702, y: 127.211, width: 15.307, height: 14.173 }]
+        ];
+        const otherCheckboxRect = { x: 139.702, y: 152.736, width: 15.307, height: 14.173 };
+        const otherTextRect = { x: 237.477, y: 150.271, width: 303.599, height: 18.997 };
+        const bodyRect = { x: 54.855, y: 177.056, width: 486.221, height: 553.168 };
+        const nameRect = { x: 329.719, y: 737.864, width: 211.679, height: 17.107 };
+        const bodyLineHeight = data.fontSize === 10 ? 10.2 : data.fontSize * 1.15;
+        const bodyParagraphs = [[]];
+        for (const run of data.richRuns) {
+          for (const part of run.text.split(/(\n)/)) {
+            if (part === "\n") bodyParagraphs.push([]);
+            else if (part) bodyParagraphs[bodyParagraphs.length - 1].push(runXml(part, run));
+          }
+        }
+        const bodyXml = bodyParagraphs.map(runs => paragraphXml(runs.join(""), bodyLineHeight)).join("");
+        const shapes = [
+          fieldBox("DateField", dateRect, data.dateDisplay),
+          ...checkboxRects.map(([type, rect]) => checkBox(`Checkbox-${type}`, rect, data.types.includes(type))),
+          checkBox("Checkbox-Autre", otherCheckboxRect, data.types.some(type => type === "Autre" || type === "Vœu")),
+          fieldBox("OtherType", otherTextRect, data.otherType),
+          fieldBox("NameField", nameRect, data.name),
+          textBox("InterventionText", {
+            x: bodyRect.x + 5,
+            y: bodyRect.y + 5,
+            width: bodyRect.width - 10,
+            height: bodyRect.height - 8
+          }, bodyXml, "5pt,5pt,3pt,5pt"),
+        ].join("");
+        const bodyStart = documentXml.indexOf("<w:body>");
+        const sectionStart = documentXml.lastIndexOf("<w:sectPr");
+        const backgroundParagraphEnd = documentXml.indexOf("</w:p>", bodyStart);
+        if (bodyStart < 0 || sectionStart < 0 || backgroundParagraphEnd < 0) throw new Error("Le document Word n’a pas pu recevoir le modèle officiel.");
+        documentXml = `${documentXml.slice(0, backgroundParagraphEnd + "</w:p>".length)}${shapes}${documentXml.slice(sectionStart)}`;
+        packageZip.file("word/document.xml", documentXml);
+        return packageZip.generateAsync({
+          type: "blob",
+          mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        });
       }
 
       function xmlEscape(text) {
@@ -1065,7 +1290,7 @@
         }).join("") || " ";
       }
 
-      async function createOdt(data, signature) {
+      async function createOdtLegacy(data, signature) {
         if (!window.JSZip) throw new Error("La bibliothèque LibreOffice n’a pas pu être chargée. Vérifiez votre connexion, puis réessayez.");
         const zip = new JSZip();
         const logoBytes = await loadTemplateLogo();
@@ -1134,6 +1359,101 @@
         zip.file("styles.xml", styles);
         zip.file("META-INF/manifest.xml", manifest);
         zip.file("Pictures/ecublens-logo.png", logoBytes);
+        if (signature) zip.file(`Pictures/signature.${signature.type}`, signature.bytes);
+        return zip.generateAsync({ type: "blob", mimeType: "application/vnd.oasis.opendocument.text" });
+      }
+
+      async function createOdt(data, signature) {
+        if (!window.JSZip) throw new Error("La bibliothèque LibreOffice n’a pas pu être chargée. Vérifiez votre connexion, puis réessayez.");
+        const zip = new JSZip();
+        const backgroundBytes = await loadTemplateBackground();
+        const ptToCm = value => `${(value * 2.54 / 72).toFixed(4)}cm`;
+        const pageWidth = 595.32;
+        const pageHeight = 841.92;
+        const frame = (name, x, y, width, height, style, text, layer = "layout", zIndex = 1) =>
+          `<draw:frame draw:style-name="${style}" draw:name="${name}" text:anchor-type="page" svg:x="${ptToCm(x)}" svg:y="${ptToCm(y)}" svg:width="${ptToCm(width)}" svg:height="${ptToCm(height)}" draw:layer="${layer}" draw:z-index="${zIndex}">${text}</draw:frame>`;
+        const textFrame = (name, rect, value, paragraphStyle, options = {}) => frame(
+          name,
+          options.x ?? rect.x,
+          options.y ?? rect.y,
+          options.width ?? rect.width,
+          options.height ?? rect.height,
+          options.frameStyle || "FieldFrame",
+          `<draw:text-box><text:p text:style-name="${paragraphStyle}">${value}</text:p></draw:text-box>`
+        );
+        const checkboxFrame = (name, rect, checked) => checked
+          ? textFrame(name, rect, "X", "Check", { frameStyle: "CheckFrame" })
+          : "";
+        const dateRect = { x: 464.503, y: 91.883, width: 76.573, height: 18.997 };
+        const checkboxRects = [
+          ["Postulat", { x: 139.424, y: 127.211, width: 15.307, height: 14.173 }],
+          ["Motion", { x: 252.702, y: 127.211, width: 15.307, height: 14.173 }],
+          ["Amendement", { x: 366.702, y: 127.211, width: 15.307, height: 14.173 }]
+        ];
+        const checkboxes = checkboxRects
+          .map(([type, rect]) => checkboxFrame(`Checkbox-${type}`, rect, data.types.includes(type)))
+          .join("");
+        const otherCheckboxRect = { x: 139.702, y: 152.736, width: 15.307, height: 14.173 };
+        const otherTextRect = { x: 237.477, y: 150.271, width: 303.599, height: 18.997 };
+        const bodyRect = { x: 54.855, y: 177.056, width: 486.221, height: 553.168 };
+        const nameRect = { x: 329.719, y: 737.864, width: 211.679, height: 17.107 };
+        const signatureRect = { x: 317.381, y: 756.959, width: 224.017, height: 17.107 };
+        const bodyLineHeight = data.fontSize === 10 ? "10.2pt" : `${(data.fontSize * 1.15).toFixed(2)}pt`;
+        const backgroundFrame = frame(
+          "TemplateBackground", 0, 0, pageWidth, pageHeight, "TemplateBackgroundFrame",
+          `<draw:image xlink:href="Pictures/template-formulaire.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>`,
+          "background", 0
+        );
+        const mainText = textFrame(
+          "InterventionText",
+          bodyRect,
+          odtRichText(data.richRuns),
+          "Body",
+          { x: bodyRect.x + 5, y: bodyRect.y + 5, width: bodyRect.width - 10, height: bodyRect.height - 8, frameStyle: "BodyFrame" }
+        );
+        const signatureImage = signature
+          ? (() => {
+              const scale = Math.min(signatureRect.width / signature.width, signatureRect.height / signature.height);
+              const width = signature.width * scale;
+              const height = signature.height * scale;
+              return `<draw:frame draw:style-name="SignatureFrame" draw:name="Signature" text:anchor-type="page" svg:x="${ptToCm(signatureRect.x)}" svg:y="${ptToCm(signatureRect.y + (signatureRect.height - height) / 2)}" svg:width="${ptToCm(width)}" svg:height="${ptToCm(height)}" draw:layer="layout" draw:z-index="2"><draw:image xlink:href="Pictures/signature.${signature.type}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/></draw:frame>`;
+            })()
+          : "";
+        const runStyles = [...new Set(data.richRuns.map(richStyleName).filter(Boolean))].map(style => {
+          const props = style.slice(4);
+          const textProps = [
+            props.includes("Bold") ? 'fo:font-weight="bold"' : "",
+            props.includes("Italic") ? 'fo:font-style="italic"' : "",
+            props.includes("Underline") ? 'style:text-underline-style="solid"' : "",
+            props.includes("Strike") ? 'style:text-line-through-style="solid"' : ""
+          ].filter(Boolean).join(" ");
+          return `<style:style style:name="${style}" style:family="text"><style:text-properties ${textProps}/></style:style>`;
+        }).join("");
+        const content = `<?xml version="1.0" encoding="UTF-8"?>
+<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" office:version="1.3">
+  <office:automatic-styles>
+    <style:style style:name="Anchor" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="0.01cm"/><style:text-properties fo:font-size="1pt"/></style:style>
+    <style:style style:name="FieldText" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="100%"/><style:text-properties fo:font-family="Arial" fo:font-size="9pt"/></style:style>
+    <style:style style:name="Check" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:text-align="center" fo:line-height="100%"/><style:text-properties fo:font-family="Arial" fo:font-size="10pt"/></style:style>
+    <style:style style:name="Body" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="${bodyLineHeight}"/><style:text-properties fo:font-family="Arial" fo:font-size="${data.fontSize}pt"/></style:style>
+    <style:style style:name="TemplateBackgroundFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="background" draw:fill="none" draw:stroke="none" fo:padding="0cm"/></style:style>
+    <style:style style:name="FieldFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="foreground" draw:fill="none" draw:stroke="none" draw:textarea-vertical-align="middle" fo:padding="0cm"/></style:style>
+    <style:style style:name="CheckFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="foreground" draw:fill="none" draw:stroke="none" draw:textarea-vertical-align="middle" fo:padding="0cm"/></style:style>
+    <style:style style:name="BodyFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="foreground" draw:fill="none" draw:stroke="none" draw:textarea-vertical-align="top" fo:padding="0cm"/></style:style>
+    <style:style style:name="SignatureFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="foreground" draw:fill="none" draw:stroke="none" fo:padding="0cm"/></style:style>
+    ${runStyles}
+  </office:automatic-styles>
+  <office:body><office:text><text:p text:style-name="Anchor">${backgroundFrame}${textFrame("Date", dateRect, xmlEscape(data.dateDisplay), "FieldText")}${checkboxes}${checkboxFrame("Checkbox-Autre", otherCheckboxRect, data.types.some(type => type === "Autre" || type === "Vœu"))}${textFrame("AutreType", otherTextRect, xmlEscape(data.otherType), "FieldText")}${mainText}${textFrame("Nom", nameRect, xmlEscape(data.name), "FieldText")}${signatureImage}</text:p></office:text></office:body>
+</office:document-content>`;
+        const styles = `<?xml version="1.0" encoding="UTF-8"?>
+<office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" office:version="1.3"><office:styles/><office:automatic-styles><style:page-layout style:name="Page"><style:page-layout-properties fo:page-width="21cm" fo:page-height="29.7cm" style:print-orientation="portrait" fo:margin-top="0cm" fo:margin-bottom="0cm" fo:margin-left="0cm" fo:margin-right="0cm"/></style:page-layout></office:automatic-styles><office:master-styles><style:master-page style:name="Default" style:page-layout-name="Page"/></office:master-styles></office:document-styles>`;
+        const manifest = `<?xml version="1.0" encoding="UTF-8"?>
+<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.3"><manifest:file-entry manifest:full-path="/" manifest:media-type="application/vnd.oasis.opendocument.text"/><manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/><manifest:file-entry manifest:full-path="styles.xml" manifest:media-type="text/xml"/><manifest:file-entry manifest:full-path="Pictures/template-formulaire.png" manifest:media-type="image/png"/>${signature ? `<manifest:file-entry manifest:full-path="Pictures/signature.${signature.type}" manifest:media-type="${signature.type === "png" ? "image/png" : "image/jpeg"}"/>` : ""}</manifest:manifest>`;
+        zip.file("mimetype", "application/vnd.oasis.opendocument.text", { compression: "STORE" });
+        zip.file("content.xml", content);
+        zip.file("styles.xml", styles);
+        zip.file("META-INF/manifest.xml", manifest);
+        zip.file("Pictures/template-formulaire.png", backgroundBytes);
         if (signature) zip.file(`Pictures/signature.${signature.type}`, signature.bytes);
         return zip.generateAsync({ type: "blob", mimeType: "application/vnd.oasis.opendocument.text" });
       }
