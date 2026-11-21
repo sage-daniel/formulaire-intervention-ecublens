@@ -762,21 +762,18 @@
         const subjectDate = dateInput.value
           ? new Date(`${dateInput.value}T12:00:00`)
           : new Date();
-        const formattedDate = new Intl.DateTimeFormat("fr-CH", {
+        const subjectDateParts = Object.fromEntries(new Intl.DateTimeFormat("fr-CH", {
           day: "2-digit",
-          month: "2-digit",
+          month: "long",
           year: "numeric"
-        }).format(subjectDate);
-        const subjectParts = [
-          "Intervention",
-          type,
-          "Conseil Communal d'Ecublens",
-          nameInput.value.trim(),
-          formattedDate
-        ].filter(Boolean);
+        }).formatToParts(subjectDate).map(part => [part.type, part.value]));
+        const formattedDate = `${subjectDateParts.day}-${subjectDateParts.month}-${subjectDateParts.year}`;
+        const subjectParts = [type, nameInput.value.trim(), formattedDate, "Conseil Communal d'Ecublens"].filter(Boolean);
         if (!emailSubjectEdited) emailSubjectInput.value = subjectParts.join(" | ");
         if (!emailMessageEdited) {
-          emailMessageInput.value = `Chère Madame,\n\nVeuillez trouver ci-joint mon intervention.\n\nCordialement,\n\n${nameInput.value.trim()}`;
+          const subjectLine = emailSubjectInput.value.trim();
+          const subjectText = subjectLine ? `Objet : ${subjectLine}\n\n` : "";
+          emailMessageInput.value = `${subjectText}Chère Madame,\n\nVeuillez trouver ci-joint mon intervention.\n\nCordialement,\n\n${nameInput.value.trim()}`;
         }
       }
 
@@ -970,9 +967,9 @@
         if (signatureImage && signature) {
           const signatureRect = {
             x: 317.381,
-            y: 841.92 - (759.42 + 30),
+            y: 841.92 - (759.42 + 36),
             width: 224.017,
-            height: 30
+            height: 36
           };
           const scale = Math.min(
             signatureRect.width / signature.width,
@@ -1032,7 +1029,8 @@
           transformation: { width: toPixels(pageWidth), height: toPixels(pageHeight) },
           floating: positionImage(0, 0, 0)
         })];
-        const signatureRect = { x: 317.381, y: 759.42, width: 224.017, height: 30 };
+        const signatureRect = { x: 317.381, y: 759.42, width: 224.017, height: 36 };
+        const signatureLabelRect = { x: 255.17, y: 762.5, width: signatureRect.x - 255.17, height: 17.107 };
         if (signature) {
           const scale = Math.min(
             toPixels(signatureRect.width) / signature.width,
@@ -1127,6 +1125,7 @@
           ...checkboxRects.map(([type, rect]) => checkBox(`Checkbox-${type}`, rect, data.types.includes(type))),
           checkBox("Checkbox-Autre", otherCheckboxRect, data.types.some(type => type === "Autre" || type === "Vœu" || type === "Question")),
           fieldBox("OtherType", otherTextRect, data.otherType),
+          fieldBox("SignatureLabel", signatureLabelRect, "Signature :", 11, "#FFFFFF"),
           fieldBox("NameLabel", nameLabelRect, "Prénom, nom :", 10.5, "#FFFFFF"),
           fieldBox("NameField", nameRect, data.name),
           textBox("InterventionText", {
@@ -1216,7 +1215,8 @@
         const bodyRect = { x: 54.855, y: 177.056, width: 486.221, height: 553.168 };
         const nameRect = { x: 329.719, y: 737.864, width: 211.679, height: 17.107 };
         const nameLabelRect = { x: 255.17, y: 737.864, width: 74.4, height: 17.107 };
-        const signatureRect = { x: 317.381, y: 759.42, width: 224.017, height: 30 };
+        const signatureRect = { x: 317.381, y: 759.42, width: 224.017, height: 36 };
+        const signatureLabelRect = { x: 255.17, y: 762.5, width: signatureRect.x - 255.17, height: 17.107 };
         const bodyLineHeight = data.fontSize === 10 ? "10.2pt" : `${(data.fontSize * 1.15).toFixed(2)}pt`;
         const bodyTextOffsetY = 15;
         const backgroundFrame = frame(
@@ -1273,7 +1273,7 @@
     <style:style style:name="SignatureFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="foreground" style:horizontal-pos="from-left" style:horizontal-rel="page" style:vertical-pos="from-top" style:vertical-rel="page" draw:fill="none" draw:stroke="none" fo:padding="0cm"/></style:style>
     ${runStyles}
   </office:automatic-styles>
-  <office:body><office:text><text:p text:style-name="Anchor">${backgroundFrame}${textFrame("CityLabel", cityLabelRect, "Ecublens VD, le", "FormLabel", { frameStyle: "FormLabelFrame", zIndex: 2 })}${textFrame("Date", dateRect, xmlEscape(data.dateDisplay), "FieldText", { zIndex: 2 })}${typeLabelRects.map(([name, rect, text, size = 11]) => textFrame(name, rect, xmlEscape(text), size === 10 ? "FormLabelBoldSmall" : "FormLabelBold", { frameStyle: "FormLabelFrame", zIndex: 2 })).join("")}${checkboxes}${checkboxFrame("Checkbox-Autre", otherCheckboxRect, data.types.some(type => type === "Autre" || type === "Vœu" || type === "Question"))}${textFrame("AutreType", otherTextRect, xmlEscape(data.otherType), "FieldText", { zIndex: 2 })}${mainText}${textFrame("NameLabel", nameLabelRect, "Prénom, nom :", "FormLabel", { frameStyle: "FormLabelFrame", zIndex: 2 })}${textFrame("Nom", nameRect, xmlEscape(data.name), "FieldText", { zIndex: 2 })}${signatureImage}</text:p></office:text></office:body>
+  <office:body><office:text><text:p text:style-name="Anchor">${backgroundFrame}${textFrame("CityLabel", cityLabelRect, "Ecublens VD, le", "FormLabel", { frameStyle: "FormLabelFrame", zIndex: 2 })}${textFrame("Date", dateRect, xmlEscape(data.dateDisplay), "FieldText", { zIndex: 2 })}${typeLabelRects.map(([name, rect, text, size = 11]) => textFrame(name, rect, xmlEscape(text), size === 10 ? "FormLabelBoldSmall" : "FormLabelBold", { frameStyle: "FormLabelFrame", zIndex: 2 })).join("")}${checkboxes}${checkboxFrame("Checkbox-Autre", otherCheckboxRect, data.types.some(type => type === "Autre" || type === "Vœu" || type === "Question"))}${textFrame("AutreType", otherTextRect, xmlEscape(data.otherType), "FieldText", { zIndex: 2 })}${mainText}${textFrame("SignatureLabel", signatureLabelRect, "Signature :", "FormLabel", { frameStyle: "FormLabelFrame", zIndex: 3 })}${textFrame("NameLabel", nameLabelRect, "Prénom, nom :", "FormLabel", { frameStyle: "FormLabelFrame", zIndex: 2 })}${textFrame("Nom", nameRect, xmlEscape(data.name), "FieldText", { zIndex: 2 })}${signatureImage}</text:p></office:text></office:body>
 </office:document-content>`;
         const styles = `<?xml version="1.0" encoding="UTF-8"?>
 <office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" office:version="1.3"><office:styles/><office:automatic-styles><style:page-layout style:name="Page"><style:page-layout-properties fo:page-width="21cm" fo:page-height="29.7cm" style:print-orientation="portrait" fo:margin-top="0cm" fo:margin-bottom="0cm" fo:margin-left="0cm" fo:margin-right="0cm"/></style:page-layout></office:automatic-styles><office:master-styles><style:master-page style:name="Default" style:page-layout-name="Page"/></office:master-styles></office:document-styles>`;
@@ -1343,7 +1343,7 @@
                 title: emailSubjectInput.value,
                 text: `À : ${recipients.join(", ")}\n\n${emailMessageInput.value}`
               });
-              setStatus("Documents transmis au menu de partage. Le destinataire est indiqué dans le texte, pas nécessairement dans « À », et l’objet peut ne pas être repris. Vérifiez ces champs avant l’envoi.", "success");
+              setStatus("Documents transmis au menu de partage.", "success");
               return;
             } catch (error) {
               if (error && error.name === "AbortError") {
@@ -1445,7 +1445,10 @@
       downloadButton.addEventListener("click", generateAndDownload);
 
       emailButton.addEventListener("click", prepareEmail);
-      emailSubjectInput.addEventListener("input", () => { emailSubjectEdited = true; });
+      emailSubjectInput.addEventListener("input", () => {
+        emailSubjectEdited = true;
+        updateEmailDraft();
+      });
       emailMessageInput.addEventListener("input", () => { emailMessageEdited = true; });
       updateEmailDraft();
       updateFormState();
