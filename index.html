@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#2651d4">
-  <meta name="description" content="Alternative simple et directe pour préparer une intervention sur le formulaire officiel du Conseil communal d’Ecublens.">
-  <title>Conseil communal Ecublens — Alternative pour un formulaire officiel d’intervention</title>
+  <meta name="description" content="Le hack simple pour faire une intervention dans le formulaire officiel du Conseil communal d’Ecublens.">
+  <title>Conseil communal Ecublens — Le hack simple pour faire une intervention dans le formulaire officiel</title>
   <style>
     :root {
       color-scheme: light;
@@ -88,26 +88,14 @@
       line-height: 1.15;
       letter-spacing: -.04em;
     }
-    .intro-note { margin: 9px 0 0; color: var(--muted); font-size: 14px; }
     .notice {
-      display: grid;
-      grid-template-columns: 26px 1fr;
-      gap: 12px;
+      display: block;
       margin-bottom: 22px;
       padding: 16px 18px;
       border: 1px solid var(--gold);
       border-radius: 2px;
       background: #fffef1;
       color: #34343a;
-    }
-    .notice-icon {
-      display: grid;
-      width: 24px;
-      height: 24px;
-      place-items: center;
-      border-radius: 0;
-      background: var(--gold);
-      font-weight: 800;
     }
     .notice strong { display: block; margin: 0 0 2px; color: #272a32; }
     .notice p { margin: 0; font-size: 13px; }
@@ -120,15 +108,6 @@
       box-shadow: none;
     }
     form { padding: clamp(20px, 5vw, 36px); }
-    .section-heading {
-      display: flex;
-      align-items: baseline;
-      gap: 10px;
-      margin: 0 0 20px;
-      color: var(--blue-dark);
-      font-size: 17px;
-      font-weight: 750;
-    }
     .field-grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -370,7 +349,18 @@
       font-weight: 720;
       text-decoration: none;
     }
-    .email-button:hover { background: #f1f3fc; }
+    .email-button:hover:not(:disabled) { background: #f1f3fc; }
+    .email-button:disabled { cursor: not-allowed; opacity: .48; }
+    .email-fields { display: grid; gap: 12px; margin: 20px 0 0; }
+    .email-fields textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 10px 12px;
+      border: 1px solid #b9bfca;
+      border-radius: 2px;
+      color: var(--ink);
+      resize: vertical;
+    }
     .status { min-height: 23px; margin: 12px 0 0; color: var(--muted); font-size: 13px; }
     .status[data-state="error"] { color: var(--red); }
     .status[data-state="success"] { color: var(--success); }
@@ -420,12 +410,10 @@
   <main>
     <section class="intro" aria-labelledby="page-title">
       <p class="eyebrow">Conseil communal Ecublens</p>
-      <h1 id="page-title">Alternative pour un formulaire officiel d’intervention</h1>
-      <p class="intro-note">La paperasse par-dessus bord : préparez votre intervention simplement, sans détour.</p>
+      <h1 id="page-title">Le hack simple pour faire une intervention dans le formulaire officiel</h1>
     </section>
 
     <aside class="notice" role="note" aria-label="Avertissement">
-      <span class="notice-icon" aria-hidden="true">!</span>
       <div>
         <strong>Réservé aux Conseillères et Conseillers communaux d’Ecublens</strong>
         <p>Une autre façon de préparer votre intervention. Le document téléchargé reprend le formulaire officiel.</p>
@@ -434,7 +422,6 @@
 
     <section class="card" aria-label="Formulaire">
       <form id="intervention-form">
-        <h2 class="section-heading">Votre intervention</h2>
         <fieldset class="types" aria-describedby="type-hint">
           <legend class="field-label">Type d’intervention <span class="required" aria-hidden="true">*</span></legend>
           <label class="type-option"><input type="checkbox" name="type" value="Postulat">Postulat</label>
@@ -456,8 +443,8 @@
             <input id="date" name="date" type="date">
           </div>
           <div class="field">
-            <label for="name">Nom et prénom <span class="hint">(facultatif)</span></label>
-            <input id="name" name="name" type="text" maxlength="120" autocomplete="name" placeholder="Votre nom complet">
+            <label for="name">Prénom et nom <span class="hint">(facultatif)</span></label>
+            <input id="name" name="name" type="text" maxlength="120" autocomplete="name" placeholder="Votre prénom et nom">
           </div>
         </div>
         <div class="field filename-field">
@@ -525,21 +512,31 @@
               <label class="download-choice"><input type="checkbox" name="export" value="pdf:without" checked>Sans signature</label>
             </div>
             <div class="download-card">
-              <strong>ODT (LibreOffice)</strong>
+              <strong>LibreOffice (.odt)</strong>
               <label class="download-choice"><input type="checkbox" name="export" value="odt:with" disabled>Avec signature</label>
               <label class="download-choice"><input type="checkbox" name="export" value="odt:without">Sans signature</label>
             </div>
           </div>
         </fieldset>
         <p class="hint" id="format-hint">Chaque case génère un fichier distinct. Si plusieurs sont cochées, autorisez les téléchargements multiples si votre navigateur le demande.</p>
+        <div class="email-fields">
+          <div class="field">
+            <label for="email-subject">Objet du message</label>
+            <input id="email-subject" type="text" maxlength="240">
+          </div>
+          <div class="field">
+            <label for="email-message">Message</label>
+            <textarea id="email-message" rows="6"></textarea>
+          </div>
+        </div>
         <div class="actions">
           <button class="download" id="download" type="button" disabled>
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Télécharger
           </button>
-          <a class="email-button" id="prepare-email" href="mailto:Silvana.DellaVecchia@ecublens.ch">Prepare Email</a>
+          <button class="email-button" id="prepare-email" type="button" disabled>Prepare Email</button>
         </div>
-        <p class="hint">Le brouillon est adressé à Della Vecchia Silvana. Ajoutez-y le ou les fichiers téléchargés en pièces jointes.</p>
+        <p class="hint">Le partage des fichiers dépend de votre navigateur. Si les pièces jointes ne peuvent pas être transmises directement, les fichiers seront téléchargés pour être ajoutés au brouillon destiné à Silvana Della Vecchia.</p>
         <p class="status" id="status" role="status" aria-live="polite"></p>
         <p class="privacy">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 5.5 6v5.1c0 4.3 2.7 8.2 6.5 9.9 3.8-1.7 6.5-5.6 6.5-9.9V6L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -550,7 +547,7 @@
   </main>
 
   <footer>
-    <div class="footer-inner">Alternative de préparation des interventions du Conseil communal Ecublens</div>
+    <div class="footer-inner">Conseil communal Ecublens</div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
@@ -572,6 +569,8 @@
       const signatureName = document.getElementById("signature-name");
       const signatureError = document.getElementById("signature-error");
       const emailButton = document.getElementById("prepare-email");
+      const emailSubjectInput = document.getElementById("email-subject");
+      const emailMessageInput = document.getElementById("email-message");
       const otherField = document.getElementById("other-field");
       const status = document.getElementById("status");
       const fontSizeSelect = document.getElementById("font-size");
@@ -585,6 +584,8 @@
       let signatureUrl = null;
       let signatureDimensions = null;
       let busy = false;
+      let emailSubjectEdited = false;
+      let emailMessageEdited = false;
       let templateBackgroundPromise = null;
 
       function selectedTypes() {
@@ -592,7 +593,7 @@
       }
 
       function slugifyFilename(value) {
-        return value.normalize("NFD")
+        return value.replace(/[œŒ]/g, character => character === "Œ" ? "OE" : "oe").normalize("NFD")
           .replace(/[\u0300-\u036f]/g, "")
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, "-")
@@ -713,7 +714,7 @@
         const valid = hasType && Boolean(text.trim()) && text.length <= 5000 &&
           formats.length > 0 && (!needsOther || Boolean(otherInput.value.trim()));
         downloadButton.disabled = !valid || busy;
-        updateEmailLink();
+        emailButton.disabled = !valid || busy;
         return valid;
       }
 
@@ -780,11 +781,17 @@
         return `${base}-${signature}.${extension}`;
       }
 
-      function updateEmailLink() {
-        const name = nameInput.value.trim() || "Daniel Sage";
-        const subject = "Intervention au Conseil communal d’Ecublens";
-        const body = `Chère Madame,\n\nVeuillez trouver ci-joint mon intervention.\n\nCordialement,\n\n${name}`;
-        emailButton.href = `mailto:Silvana.DellaVecchia@ecublens.ch?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      function updateEmailDraft() {
+        const type = selectedTypes()
+          .map(value => value === "Autre" ? otherInput.value.trim() || "Autre" : value)
+          .join(", ");
+        const subjectParts = [type, nameInput.value.trim(), dateInput.value
+          ? new Intl.DateTimeFormat("fr-CH", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(`${dateInput.value}T12:00:00`))
+          : ""].filter(Boolean);
+        if (!emailSubjectEdited) emailSubjectInput.value = subjectParts.join(" — ");
+        if (!emailMessageEdited) {
+          emailMessageInput.value = `Chère Madame,\n\nVeuillez trouver ci-joint mon intervention.\n\nCordialement,\n\n${nameInput.value.trim()}`;
+        }
       }
 
       function downloadBlob(blob, name) {
@@ -935,6 +942,20 @@
           italic: await pdf.embedFont(PDFLib.StandardFonts.HelveticaOblique),
           boldItalic: await pdf.embedFont(PDFLib.StandardFonts.HelveticaBoldOblique)
         };
+        page.drawRectangle({
+          x: 254.8,
+          y: 841.92 - 737.864 - 17.107,
+          width: 74.4,
+          height: 17.107,
+          color: PDFLib.rgb(1, 1, 1)
+        });
+        page.drawText("Prénom, nom :", {
+          x: 255.17,
+          y: 841.92 - 752.77,
+          size: 10.5,
+          font: fonts.regular,
+          color: PDFLib.rgb(0, 0, 0)
+        });
         drawRichTextOnPdf(page, data, textRect, fonts);
         return new Blob([await pdf.save()], { type: "application/pdf" });
       }
@@ -1201,6 +1222,7 @@
         const runXml = (text, style = {}, size = data.fontSize) => {
           const runProperties = [
             '<w:rFonts w:ascii="Arial" w:hAnsi="Arial"/>',
+            '<w:lang w:val="fr-CH"/>',
             `<w:sz w:val="${Math.round(size * 2)}"/>`,
             style.bold ? "<w:b/>" : "",
             style.italic ? "<w:i/>" : "",
@@ -1213,17 +1235,26 @@
           const properties = `<w:pPr><w:spacing w:before="0" w:after="0" w:line="${Math.round(lineHeight * 20)}" w:lineRule="exact"/>${alignment ? `<w:jc w:val="${alignment}"/>` : ""}</w:pPr>`;
           return `<w:p>${properties}${runs || runXml(" ", {}, data.fontSize)}</w:p>`;
         };
-        const textBox = (name, rect, paragraphs, inset = "0,0,0,0", zIndex = 1) => {
+        const textBox = (name, rect, paragraphs, inset = "0,0,0,0", zIndex = 1, fillColor = null) => {
           const style = `position:absolute;margin-left:${rect.x}pt;margin-top:${rect.y}pt;width:${rect.width}pt;height:${rect.height}pt;mso-position-horizontal:absolute;mso-position-horizontal-relative:page;mso-position-vertical:absolute;mso-position-vertical-relative:page;z-index:${zIndex};`;
-          return `<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="1" w:lineRule="exact"/></w:pPr><w:r><w:pict><v:rect id="${name}" style="${style}" filled="f" stroked="f"><v:textbox inset="${inset}"><w:txbxContent>${paragraphs}</w:txbxContent></v:textbox><w10:wrap type="none"/></v:rect></w:pict></w:r></w:p>`;
+          const fill = fillColor ? `filled="t" fillcolor="${fillColor}"` : 'filled="f"';
+          return `<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="1" w:lineRule="exact"/></w:pPr><w:r><w:pict><v:rect id="${name}" style="${style}" ${fill} stroked="f"><v:textbox inset="${inset}"><w:txbxContent>${paragraphs}</w:txbxContent></v:textbox><w10:wrap type="none"/></v:rect></w:pict></w:r></w:p>`;
         };
-        const fieldBox = (name, rect, text) => text
-          ? textBox(name, rect, paragraphXml(runXml(text, {}, 9), 12, "left"))
+        const fieldBox = (name, rect, text, size = 9, fillColor = null, bold = false) => text
+          ? textBox(name, rect, paragraphXml(runXml(text, { bold }, size), 12, "left"), "0,0,0,0", fillColor ? 2 : 1, fillColor)
           : "";
         const checkBox = (name, rect, checked) => checked
           ? textBox(name, rect, paragraphXml(runXml("X", {}, 10), rect.height, "center"))
           : "";
         const dateRect = { x: 464.503, y: 91.883, width: 76.573, height: 18.997 };
+        const cityLabelRect = { x: 380.5, y: 91.883, width: 83.3, height: 18.997 };
+        const typeLabelRects = [
+          ["TypeLabel", { x: 56.64, y: 126.8, width: 29.5, height: 17.1 }, "Type :"],
+          ["PostulatLabel", { x: 155.18, y: 126.8, width: 39, height: 17.1 }, "Postulat"],
+          ["MotionLabel", { x: 268.61, y: 126.8, width: 35, height: 17.1 }, "Motion"],
+          ["AmendementLabel", { x: 382.03, y: 126.8, width: 64, height: 17.1 }, "Amendement"],
+          ["OtherLabel", { x: 155.18, y: 152.35, width: 79, height: 17.1 }, "Autre (préciser) :"]
+        ];
         const checkboxRects = [
           ["Postulat", { x: 139.424, y: 127.211, width: 15.307, height: 14.173 }],
           ["Motion", { x: 252.702, y: 127.211, width: 15.307, height: 14.173 }],
@@ -1233,6 +1264,7 @@
         const otherTextRect = { x: 237.477, y: 150.271, width: 303.599, height: 18.997 };
         const bodyRect = { x: 54.855, y: 177.056, width: 486.221, height: 553.168 };
         const nameRect = { x: 329.719, y: 737.864, width: 211.679, height: 17.107 };
+        const nameLabelRect = { x: 255.17, y: 737.864, width: 74.4, height: 17.107 };
         const bodyLineHeight = data.fontSize === 10 ? 10.2 : data.fontSize * 1.15;
         const bodyParagraphs = [[]];
         for (const run of data.richRuns) {
@@ -1243,10 +1275,13 @@
         }
         const bodyXml = bodyParagraphs.map(runs => paragraphXml(runs.join(""), bodyLineHeight)).join("");
         const shapes = [
+          fieldBox("CityLabel", cityLabelRect, "Ecublens VD, le", 11, "#FFFFFF"),
           fieldBox("DateField", dateRect, data.dateDisplay),
+          ...typeLabelRects.map(([name, rect, text]) => fieldBox(name, rect, text, 11, "#FFFFFF", true)),
           ...checkboxRects.map(([type, rect]) => checkBox(`Checkbox-${type}`, rect, data.types.includes(type))),
           checkBox("Checkbox-Autre", otherCheckboxRect, data.types.some(type => type === "Autre" || type === "Vœu")),
           fieldBox("OtherType", otherTextRect, data.otherType),
+          fieldBox("NameLabel", nameLabelRect, "Prénom, nom :", 10.5, "#FFFFFF"),
           fieldBox("NameField", nameRect, data.name),
           textBox("InterventionText", {
             x: bodyRect.x + 5,
@@ -1370,7 +1405,7 @@
         const ptToCm = value => `${(value * 2.54 / 72).toFixed(4)}cm`;
         const pageWidth = 595.32;
         const pageHeight = 841.92;
-        const frame = (name, x, y, width, height, style, text, layer = "layout", zIndex = 1) =>
+        const frame = (name, x, y, width, height, style, text, layer = "foreground", zIndex = 1) =>
           `<draw:frame draw:style-name="${style}" draw:name="${name}" text:anchor-type="page" svg:x="${ptToCm(x)}" svg:y="${ptToCm(y)}" svg:width="${ptToCm(width)}" svg:height="${ptToCm(height)}" draw:layer="${layer}" draw:z-index="${zIndex}">${text}</draw:frame>`;
         const textFrame = (name, rect, value, paragraphStyle, options = {}) => frame(
           name,
@@ -1379,12 +1414,22 @@
           options.width ?? rect.width,
           options.height ?? rect.height,
           options.frameStyle || "FieldFrame",
-          `<draw:text-box><text:p text:style-name="${paragraphStyle}">${value}</text:p></draw:text-box>`
+          `<draw:text-box><text:p text:style-name="${paragraphStyle}">${value}</text:p></draw:text-box>`,
+          options.layer || "foreground",
+          options.zIndex || 1
         );
         const checkboxFrame = (name, rect, checked) => checked
           ? textFrame(name, rect, "X", "Check", { frameStyle: "CheckFrame" })
           : "";
         const dateRect = { x: 464.503, y: 91.883, width: 76.573, height: 18.997 };
+        const cityLabelRect = { x: 380.5, y: 91.883, width: 83.3, height: 18.997 };
+        const typeLabelRects = [
+          ["TypeLabel", { x: 56.64, y: 126.8, width: 29.5, height: 17.1 }, "Type :"],
+          ["PostulatLabel", { x: 155.18, y: 126.8, width: 39, height: 17.1 }, "Postulat"],
+          ["MotionLabel", { x: 268.61, y: 126.8, width: 35, height: 17.1 }, "Motion"],
+          ["AmendementLabel", { x: 382.03, y: 126.8, width: 64, height: 17.1 }, "Amendement"],
+          ["OtherLabel", { x: 155.18, y: 152.35, width: 79, height: 17.1 }, "Autre (préciser) :"]
+        ];
         const checkboxRects = [
           ["Postulat", { x: 139.424, y: 127.211, width: 15.307, height: 14.173 }],
           ["Motion", { x: 252.702, y: 127.211, width: 15.307, height: 14.173 }],
@@ -1397,6 +1442,7 @@
         const otherTextRect = { x: 237.477, y: 150.271, width: 303.599, height: 18.997 };
         const bodyRect = { x: 54.855, y: 177.056, width: 486.221, height: 553.168 };
         const nameRect = { x: 329.719, y: 737.864, width: 211.679, height: 17.107 };
+        const nameLabelRect = { x: 255.17, y: 737.864, width: 74.4, height: 17.107 };
         const signatureRect = { x: 317.381, y: 756.959, width: 224.017, height: 17.107 };
         const bodyLineHeight = data.fontSize === 10 ? "10.2pt" : `${(data.fontSize * 1.15).toFixed(2)}pt`;
         const backgroundFrame = frame(
@@ -1416,7 +1462,7 @@
               const scale = Math.min(signatureRect.width / signature.width, signatureRect.height / signature.height);
               const width = signature.width * scale;
               const height = signature.height * scale;
-              return `<draw:frame draw:style-name="SignatureFrame" draw:name="Signature" text:anchor-type="page" svg:x="${ptToCm(signatureRect.x)}" svg:y="${ptToCm(signatureRect.y + (signatureRect.height - height) / 2)}" svg:width="${ptToCm(width)}" svg:height="${ptToCm(height)}" draw:layer="layout" draw:z-index="2"><draw:image xlink:href="Pictures/signature.${signature.type}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/></draw:frame>`;
+              return `<draw:frame draw:style-name="SignatureFrame" draw:name="Signature" text:anchor-type="page" svg:x="${ptToCm(signatureRect.x)}" svg:y="${ptToCm(signatureRect.y + (signatureRect.height - height) / 2)}" svg:width="${ptToCm(width)}" svg:height="${ptToCm(height)}" draw:layer="foreground" draw:z-index="2"><draw:image xlink:href="Pictures/signature.${signature.type}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/></draw:frame>`;
             })()
           : "";
         const runStyles = [...new Set(data.richRuns.map(richStyleName).filter(Boolean))].map(style => {
@@ -1427,23 +1473,26 @@
             props.includes("Underline") ? 'style:text-underline-style="solid"' : "",
             props.includes("Strike") ? 'style:text-line-through-style="solid"' : ""
           ].filter(Boolean).join(" ");
-          return `<style:style style:name="${style}" style:family="text"><style:text-properties ${textProps}/></style:style>`;
+          return `<style:style style:name="${style}" style:family="text"><style:text-properties fo:language="fr" fo:country="CH" ${textProps}/></style:style>`;
         }).join("");
         const content = `<?xml version="1.0" encoding="UTF-8"?>
 <office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" office:version="1.3">
   <office:automatic-styles>
     <style:style style:name="Anchor" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="0.01cm"/><style:text-properties fo:font-size="1pt"/></style:style>
-    <style:style style:name="FieldText" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="100%"/><style:text-properties fo:font-family="Arial" fo:font-size="9pt"/></style:style>
-    <style:style style:name="Check" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:text-align="center" fo:line-height="100%"/><style:text-properties fo:font-family="Arial" fo:font-size="10pt"/></style:style>
-    <style:style style:name="Body" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="${bodyLineHeight}"/><style:text-properties fo:font-family="Arial" fo:font-size="${data.fontSize}pt"/></style:style>
-    <style:style style:name="TemplateBackgroundFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="background" draw:fill="none" draw:stroke="none" fo:padding="0cm"/></style:style>
-    <style:style style:name="FieldFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="foreground" draw:fill="none" draw:stroke="none" draw:textarea-vertical-align="middle" fo:padding="0cm"/></style:style>
-    <style:style style:name="CheckFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="foreground" draw:fill="none" draw:stroke="none" draw:textarea-vertical-align="middle" fo:padding="0cm"/></style:style>
-    <style:style style:name="BodyFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="foreground" draw:fill="none" draw:stroke="none" draw:textarea-vertical-align="top" fo:padding="0cm"/></style:style>
-    <style:style style:name="SignatureFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="foreground" draw:fill="none" draw:stroke="none" fo:padding="0cm"/></style:style>
+    <style:style style:name="FieldText" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="100%"/><style:text-properties fo:font-family="Arial" fo:font-size="9pt" fo:language="fr" fo:country="CH"/></style:style>
+    <style:style style:name="FormLabel" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="100%"/><style:text-properties fo:font-family="Arial" fo:font-size="11pt" fo:language="fr" fo:country="CH"/></style:style>
+    <style:style style:name="FormLabelBold" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="100%"/><style:text-properties fo:font-family="Arial" fo:font-size="11pt" fo:font-weight="bold" fo:language="fr" fo:country="CH"/></style:style>
+    <style:style style:name="Check" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:text-align="center" fo:line-height="100%"/><style:text-properties fo:font-family="Arial" fo:font-size="10pt" fo:language="fr" fo:country="CH"/></style:style>
+    <style:style style:name="Body" style:family="paragraph"><style:paragraph-properties fo:margin="0cm" fo:line-height="${bodyLineHeight}"/><style:text-properties fo:font-family="Arial" fo:font-size="${data.fontSize}pt" fo:language="fr" fo:country="CH"/></style:style>
+    <style:style style:name="TemplateBackgroundFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="background" style:horizontal-pos="from-left" style:horizontal-rel="page" style:vertical-pos="from-top" style:vertical-rel="page" draw:fill="none" draw:stroke="none" fo:padding="0cm"/></style:style>
+    <style:style style:name="FieldFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="foreground" style:horizontal-pos="from-left" style:horizontal-rel="page" style:vertical-pos="from-top" style:vertical-rel="page" draw:fill="none" draw:stroke="none" draw:textarea-vertical-align="middle" fo:padding="0cm"/></style:style>
+    <style:style style:name="FormLabelFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="foreground" style:horizontal-pos="from-left" style:horizontal-rel="page" style:vertical-pos="from-top" style:vertical-rel="page" draw:fill="solid" draw:fill-color="#FFFFFF" draw:stroke="none" draw:textarea-vertical-align="middle" fo:padding="0cm"/></style:style>
+    <style:style style:name="CheckFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="foreground" style:horizontal-pos="from-left" style:horizontal-rel="page" style:vertical-pos="from-top" style:vertical-rel="page" draw:fill="none" draw:stroke="none" draw:textarea-vertical-align="middle" fo:padding="0cm"/></style:style>
+    <style:style style:name="BodyFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="foreground" style:horizontal-pos="from-left" style:horizontal-rel="page" style:vertical-pos="from-top" style:vertical-rel="page" draw:fill="none" draw:stroke="none" draw:textarea-vertical-align="top" fo:padding="0cm"/></style:style>
+    <style:style style:name="SignatureFrame" style:family="graphic"><style:graphic-properties style:wrap="none" style:run-through="foreground" style:horizontal-pos="from-left" style:horizontal-rel="page" style:vertical-pos="from-top" style:vertical-rel="page" draw:fill="none" draw:stroke="none" fo:padding="0cm"/></style:style>
     ${runStyles}
   </office:automatic-styles>
-  <office:body><office:text><text:p text:style-name="Anchor">${backgroundFrame}${textFrame("Date", dateRect, xmlEscape(data.dateDisplay), "FieldText")}${checkboxes}${checkboxFrame("Checkbox-Autre", otherCheckboxRect, data.types.some(type => type === "Autre" || type === "Vœu"))}${textFrame("AutreType", otherTextRect, xmlEscape(data.otherType), "FieldText")}${mainText}${textFrame("Nom", nameRect, xmlEscape(data.name), "FieldText")}${signatureImage}</text:p></office:text></office:body>
+  <office:body><office:text><text:p text:style-name="Anchor">${backgroundFrame}${textFrame("CityLabel", cityLabelRect, "Ecublens VD, le", "FormLabel", { frameStyle: "FormLabelFrame", zIndex: 2 })}${textFrame("Date", dateRect, xmlEscape(data.dateDisplay), "FieldText", { zIndex: 2 })}${typeLabelRects.map(([name, rect, text]) => textFrame(name, rect, xmlEscape(text), "FormLabelBold", { frameStyle: "FormLabelFrame", zIndex: 2 })).join("")}${checkboxes}${checkboxFrame("Checkbox-Autre", otherCheckboxRect, data.types.some(type => type === "Autre" || type === "Vœu"))}${textFrame("AutreType", otherTextRect, xmlEscape(data.otherType), "FieldText", { zIndex: 2 })}${mainText}${textFrame("NameLabel", nameLabelRect, "Prénom, nom :", "FormLabel", { frameStyle: "FormLabelFrame", zIndex: 2 })}${textFrame("Nom", nameRect, xmlEscape(data.name), "FieldText", { zIndex: 2 })}${signatureImage}</text:p></office:text></office:body>
 </office:document-content>`;
         const styles = `<?xml version="1.0" encoding="UTF-8"?>
 <office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" office:version="1.3"><office:styles/><office:automatic-styles><style:page-layout style:name="Page"><style:page-layout-properties fo:page-width="21cm" fo:page-height="29.7cm" style:print-orientation="portrait" fo:margin-top="0cm" fo:margin-bottom="0cm" fo:margin-left="0cm" fo:margin-right="0cm"/></style:page-layout></office:automatic-styles><office:master-styles><style:master-page style:name="Default" style:page-layout-name="Page"/></office:master-styles></office:document-styles>`;
@@ -1458,33 +1507,37 @@
         return zip.generateAsync({ type: "blob", mimeType: "application/vnd.oasis.opendocument.text" });
       }
 
+      async function generateOutputs(data, formats) {
+        const signature = formats.some(format => format.endsWith(":with")) ? await readSignature() : null;
+        if (formats.some(format => !format.startsWith("pdf:"))) await createPdf(data, null);
+        const outputs = [];
+        for (const choice of formats) {
+          const [format, signatureMode] = choice.split(":");
+          const includesSignature = signatureMode === "with";
+          let blob;
+          if (format === "pdf") blob = await createPdf(data, includesSignature ? signature : null);
+          else if (format === "docx") blob = await createDocx(data, includesSignature ? signature : null);
+          else if (format === "odt") blob = await createOdt(data, includesSignature ? signature : null);
+          outputs.push({ blob, name: filename(data, format, includesSignature) });
+        }
+        return outputs;
+      }
+
+      async function downloadOutputs(outputs) {
+        for (const output of outputs) {
+          downloadBlob(output.blob, output.name);
+          await new Promise(resolve => window.setTimeout(resolve, 250));
+        }
+      }
+
       async function generateAndDownload() {
         if (!updateFormState()) return;
         busy = true;
         updateFormState();
         setStatus("Génération du document…");
         try {
-          const data = getFormData();
-          const formats = selectedFormats();
-          const signature = formats.some(format => format.endsWith(":with")) ? await readSignature() : null;
-          if (formats.some(format => !format.startsWith("pdf:"))) await createPdf(data, null);
-          const outputs = [];
-          for (const choice of formats) {
-            const [format, signatureMode] = choice.split(":");
-            const includesSignature = signatureMode === "with";
-            let blob;
-            if (format === "pdf") blob = await createPdf(data, includesSignature ? signature : null);
-            else if (format === "docx") blob = await createDocx(data, includesSignature ? signature : null);
-            else if (format === "odt") blob = await createOdt(data, includesSignature ? signature : null);
-            outputs.push({
-              blob,
-              name: filename(data, format, includesSignature)
-            });
-          }
-          for (const output of outputs) {
-            downloadBlob(output.blob, output.name);
-            await new Promise(resolve => window.setTimeout(resolve, 250));
-          }
+          const outputs = await generateOutputs(getFormData(), selectedFormats());
+          await downloadOutputs(outputs);
           setStatus(`${outputs.length} fichier${outputs.length > 1 ? "s" : ""} téléchargé${outputs.length > 1 ? "s" : ""}. Autorisez les téléchargements multiples si votre navigateur le demande.`, "success");
         } catch (error) {
           setStatus(error instanceof Error ? error.message : "Le document n’a pas pu être généré.", "error");
@@ -1494,13 +1547,50 @@
         }
       }
 
-      form.addEventListener("input", () => {
+      async function prepareEmail() {
+        if (!updateFormState()) return;
+        busy = true;
+        updateFormState();
+        setStatus("Préparation du message et des documents…");
+        try {
+          const outputs = await generateOutputs(getFormData(), selectedFormats());
+          const files = outputs.map(output => new File([output.blob], output.name, { type: output.blob.type }));
+          if (navigator.share && navigator.canShare && navigator.canShare({ files })) {
+            try {
+              await navigator.share({
+                files,
+                title: emailSubjectInput.value,
+                text: `À : Silvana Della Vecchia <Silvana.DellaVecchia@ecublens.ch>\n\n${emailMessageInput.value}`
+              });
+              setStatus("Les documents ont été transmis au menu de partage. Choisissez votre application de messagerie et vérifiez le destinataire.", "success");
+              return;
+            } catch (error) {
+              if (error && error.name === "AbortError") {
+                setStatus("Partage annulé. Aucun document n’a été envoyé.", "");
+                return;
+              }
+            }
+          }
+          await downloadOutputs(outputs);
+          window.location.href = `mailto:Silvana.DellaVecchia@ecublens.ch?subject=${encodeURIComponent(emailSubjectInput.value)}&body=${encodeURIComponent(emailMessageInput.value)}`;
+          setStatus("Les documents ont été téléchargés. Ajoutez-les au brouillon de votre messagerie.", "success");
+        } catch (error) {
+          setStatus(error instanceof Error ? error.message : "Le message n’a pas pu être préparé.", "error");
+        } finally {
+          busy = false;
+          updateFormState();
+        }
+      }
+
+      form.addEventListener("input", event => {
         updateOtherTypeError();
         updateFormState();
+        if (!["email-subject", "email-message"].includes(event.target.id)) updateEmailDraft();
       });
-      form.addEventListener("change", () => {
+      form.addEventListener("change", event => {
         updateOtherTypeError();
         updateFormState();
+        if (!["email-subject", "email-message"].includes(event.target.id)) updateEmailDraft();
       });
 
       for (const button of formatTools) {
@@ -1574,6 +1664,10 @@
 
       downloadButton.addEventListener("click", generateAndDownload);
 
+      emailButton.addEventListener("click", prepareEmail);
+      emailSubjectInput.addEventListener("input", () => { emailSubjectEdited = true; });
+      emailMessageInput.addEventListener("input", () => { emailMessageEdited = true; });
+      updateEmailDraft();
       updateFormState();
     })();
   </script>
